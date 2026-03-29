@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Accadie</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --p-bg:#080e1a;--p-surface:#0f172a;--p-border:#1e293b;--p-muted:#334155;
+  --p-text:#f1f5f9;--p-dim:#8a9e8c;--p-green:#22c55e;--p-orange:#f97316;
+  --p-red:#ef4444;--p-blue:#3b82f6;--p-blue-dk:#1d4ed8;
+  --a-bg:#0a0f0d;--a-surface:#111a14;--a-surface2:#162019;--a-border:#1f2e23;
+  --a-green:#4ade80;--a-green-dk:#16a34a;--a-green-dim:#1a3324;
+  --a-amber:#fbbf24;--a-text:#e8f0ea;--a-dim:#8a9e8c;--a-dim2:#3a4f3d;
+  --gold:#c9a84c;--gold-dim:rgba(201,168,76,0.18);
+}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'DM Sans','Helvetica Neue',Arial,sans-serif}
+.hidden{display:none!important}
+/* MODULE SYSTEM */
+.module{position:fixed;inset:0;z-index:5;display:none}
+.module.active{display:block}
+/* SWITCH BUTTON */
+.switch-btn{
+  position:fixed;bottom:18px;right:16px;z-index:9999;
+  width:52px;height:52px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.2);
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  font-size:26px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  transition:transform 0.15s,opacity 0.15s;
+  -webkit-appearance:none;appearance:none;color:white
+}
+.switch-btn:active{transform:scale(0.88);opacity:0.7}
+/* LANGUAGE FLAGS */
+.lang-bar{display:flex;gap:4px}
+.lang-flag{font-size:20px;cursor:pointer;border-radius:4px;padding:1px 3px;opacity:0.35;
+  transition:opacity 0.15s;-webkit-appearance:none;appearance:none;background:none;border:none;line-height:1}
+.lang-flag.active{opacity:1}
+.lang-flag:active{opacity:0.6}
+
+/* ═══════════════════════ MENU MODULE ═══════════════════════ */
+#module-menu{color:#f1f5f9;background:#060b12}
+.menu-bg{
+  position:absolute;inset:0;
+  background-image:url('background.png');
+  background-size:cover;background-position:center;
+}
+.menu-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,6,14,0.80) 0%,rgba(3,6,14,0.93) 55%,rgba(3,6,14,0.98) 100%)}
+.menu-inner{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;padding:0 20px 32px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.menu-lang-row{width:100%;display:flex;justify-content:flex-end;padding:16px 0 8px}
+.menu-logo-wrap{display:flex;flex-direction:column;align-items:center;gap:0;margin-bottom:28px;margin-top:4px}
+.menu-logo-ring{width:110px;height:110px;border-radius:18px;border:1px solid rgba(201,168,76,0.45);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px}
+.menu-logo-ring::before{content:'';position:absolute;inset:5px;border-radius:13px;border:1px solid rgba(201,168,76,0.15)}
+.menu-logo-img{width:68px;height:68px;object-fit:contain}
+.menu-brand-name{font-family:'DM Sans',sans-serif;font-size:36px;font-weight:300;letter-spacing:0.3em;color:#fff;line-height:1;text-transform:uppercase}
+.menu-brand-rule{width:32px;height:1px;background:var(--gold);opacity:0.6;margin:10px 0 8px}
+.menu-brand-sub{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.28em;color:var(--gold);text-transform:uppercase;opacity:0.85}
+.menu-grid{width:100%;max-width:420px;display:flex;flex-direction:column;gap:10px}
+.menu-sec{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.28em;color:var(--gold);text-transform:uppercase;margin-top:10px;margin-bottom:2px;opacity:0.7}
+.menu-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-left-width:2px;
+  border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;
+  cursor:pointer;transition:background 0.16s,transform 0.1s;
+  -webkit-appearance:none;appearance:none;width:100%;text-align:left;color:#f1f5f9
+}
+.menu-card:active{transform:scale(0.97);background:rgba(255,255,255,0.08)}
+.mc-sg{border-left-color:rgba(74,222,128,0.7)}
+.mc-sg:active{background:rgba(74,222,128,0.05)}
+.mc-put{border-left-color:rgba(59,130,246,0.7)}
+.mc-put:active{background:rgba(59,130,246,0.05)}
+.mc-instr{padding:13px 16px;background:rgba(255,255,255,0.025);border-left-color:rgba(201,168,76,0.35)}
+.mc-icon{font-size:28px;flex-shrink:0;width:40px;text-align:center}
+.mc-icon.sm{font-size:18px;width:30px}
+.mc-text{flex:1}
+.mc-title{font-family:'DM Sans',sans-serif;font-size:17px;font-weight:500;letter-spacing:0.02em;color:#f0ede6;line-height:1.2}
+.mc-title.lg{font-size:19px}
+.mc-desc{font-size:12px;color:rgba(255,255,255,0.52);margin-top:3px;line-height:1.4;font-family:'DM Sans',sans-serif}
+.mc-arr{font-size:16px;color:rgba(255,255,255,0.25);flex-shrink:0}
+.mc-sg .mc-arr{color:rgba(74,222,128,0.55)}
+.mc-put .mc-arr{color:rgba(59,130,246,0.55)}
+.mc-instr .mc-arr{color:rgba(201,168,76,0.4)}
+
+/* ═══════════════════════ INSTRUCTION OVERLAY ═══════════════════════ */
+#instr-overlay{position:fixed;inset:0;z-index:300;background:rgba(4,8,18,0.98);display:none;flex-direction:column;overflow:hidden}
+#instr-overlay.vis{display:flex}
+.instr-hdr{display:flex;align-items:center;gap:12px;padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0}
+.instr-back{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;-webkit-appearance:none;appearance:none}
+.instr-back:active{opacity:0.55}
+.instr-htitle{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.1em;color:#fff;flex:1}
+.instr-body{flex:1;overflow-y:auto;padding:18px 18px 40px;font-size:14px;line-height:1.72;color:rgba(255,255,255,0.78);-webkit-overflow-scrolling:touch}
+.instr-body h1{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:0.07em;margin:22px 0 7px}
+.instr-body h1:first-child{margin-top:0}
+.instr-body h2{font-family:'Bebas Neue',sans-serif;font-size:20px;color:rgba(255,255,255,0.82);letter-spacing:0.05em;margin:18px 0 5px}
+.instr-body h3{font-size:14px;font-weight:700;color:rgba(255,255,255,0.72);margin:14px 0 3px}
+.instr-body p{margin-bottom:10px}
+.instr-body ul,.instr-body ol{padding-left:18px;margin-bottom:10px}
+.instr-body li{margin-bottom:5px}
+.instr-body table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px}
+.instr-body th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);padding:5px 7px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:left}
+.instr-body td{padding:6px 7px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top}
+.instr-body strong{color:rgba(255,255,255,0.92)}
+.instr-body hr{border:none;border-top:1px solid rgba(255,255,255,0.07);margin:18px 0}
+.instr-body blockquote{background:rgba(255,255,255,0.03);border-left:3px solid rgba(255,255,255,0.18);padding:9px 13px;border-radius:0 8px 8px 0;margin:10px 0}
+
+/* ═══════════════════════ PUTTING MODULE ═══════════════════════ */
+#module-putting{background:#080e1a;color:#f1f5f9;font-family:'DM Sans','Helvetica Neue',Arial,sans-serif}
+.p-sl{position:absolute;inset:0;z-index:10;background:#080e1a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:40px}
+.p-sl.hidden{display:none!important}
+.p-perm h1{font-size:39px;font-weight:300;letter-spacing:0.08em}
+.p-perm p{font-size:21px;color:var(--p-dim);line-height:1.7;max-width:400px}
+.p-rot .p-ri{font-size:96px;animation:spin90 1.4s ease-in-out infinite alternate}
+@keyframes spin90{from{transform:rotate(0deg)}to{transform:rotate(-90deg)}}
+.p-rot h2{font-size:33px;font-weight:300;letter-spacing:0.06em}
+.p-rot p{font-size:21px;color:var(--p-dim);line-height:1.6}
+.p-cal h2{font-size:33px;font-weight:300;letter-spacing:0.06em}
+.p-cal p{font-size:21px;color:var(--p-dim);line-height:1.7;max-width:420px}
+.p-csb{background:#0f172a;border:1px solid rgba(34,197,94,0.27);border-radius:10px;padding:12px 24px;font-size:18px;color:var(--p-dim);text-align:center;max-width:380px;line-height:1.6}
+.p-cg{color:#22c55e;font-weight:700}
+.p-cts{font-size:15px;color:#334155;margin-top:3px}
+.p-cab{background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:24px 40px;text-align:center;min-width:280px}
+.p-cc{font-size:96px;font-weight:300;font-variant-numeric:tabular-nums;line-height:1;color:#3b82f6}
+.p-cst{font-size:21px;color:var(--p-dim);margin-top:8px;min-height:28px}
+.p-cst.warn{color:#f97316}
+#p-ar{position:absolute;inset:0;display:none;flex-direction:row;overflow:hidden}
+#p-ar.vis{display:flex}
+.p-pl{width:160px;min-width:140px;background:#0f172a;border-right:1px solid #1e293b;display:flex;flex-direction:column;padding:10px 10px 6px;gap:8px}
+.p-at{font-size:14px;font-weight:300;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase;opacity:0.85}
+.p-lb{background:#080e1a;border-radius:10px;border:1px solid #1e293b;padding:8px 10px;flex:1}
+.p-sb{background:#080e1a;border-radius:10px;border:1px solid #1e293b;padding:8px 10px}
+.p-bl{font-size:13px;letter-spacing:0.16em;color:var(--p-dim);text-transform:uppercase;margin-bottom:4px}
+.p-si{display:flex;align-items:center;margin-top:4px}
+.p-nb{border:1px solid #1e293b;border-radius:8px;background:#0f172a;color:#f1f5f9;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.p-nb:active{opacity:0.6}
+.p-nv{flex:1;text-align:center;font-size:45px;font-weight:300;font-variant-numeric:tabular-nums;color:#f1f5f9}
+.p-nvi{flex:1;text-align:center;font-size:45px;font-weight:300;font-variant-numeric:tabular-nums;background:#0f172a;border:2px solid #3b82f6;border-radius:8px;color:#f1f5f9;width:100%;-webkit-appearance:none;appearance:none;outline:none;padding:0;font-family:inherit}
+button{-webkit-appearance:none;appearance:none;font-family:inherit;cursor:pointer}
+.p-lb2{display:flex;flex-direction:column;gap:5px}
+.p-smb{width:100%;height:34px;border:1px solid #1e293b;border-radius:8px;background:#0f172a;color:var(--p-dim);font-size:15px;font-weight:500;letter-spacing:0.04em;display:inline-flex;align-items:center;justify-content:center;-webkit-appearance:none;appearance:none}
+.p-smb:active{opacity:0.6}
+.p-smb.blue{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.p-smb.grn{background:#15803d;color:#fff;border-color:#15803d}
+.p-smb.pur{background:#6d28d9;color:#fff;border-color:#6d28d9}
+.p-pc{flex:1;background:#080e1a;border-right:1px solid #1e293b;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;position:relative}
+#p-s-locked,#p-s-reading{position:absolute;top:33%;left:10px;right:10px;width:auto!important}
+.p-ag{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:40px;display:flex;flex-direction:column;align-items:center;pointer-events:none;z-index:1}
+.p-aft{font-size:33px;line-height:1;padding:4px 0 2px}
+.p-avl{flex:1;width:1px;background:#334155;opacity:0.4}
+.p-abb{font-size:27px;line-height:1;padding:2px 0 4px}
+.p-stl{font-size:13px;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;opacity:0.8}
+.p-lg{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:10px}
+.p-lbx{background:#0f172a;border-radius:10px;border:1px solid #1e293b;padding:10px 12px;text-align:center}
+.p-lbx .lbl{font-size:13px;color:var(--p-dim);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:2px}
+.p-lbx .val{font-size:48px;font-weight:300;font-variant-numeric:tabular-nums;line-height:1.1}
+.p-lbx .sub{font-size:15px;color:var(--p-dim);margin-top:2px}
+.p-cs2{color:#4ade80}.p-cu{color:#fb923c}
+.p-lr{display:flex;gap:8px;width:100%;margin-bottom:10px}
+.p-lc{flex:1;background:#0f172a;border-radius:10px;border:1px solid #1e293b;padding:8px 10px;text-align:center}
+.p-lc .lbl{font-size:13px;color:var(--p-dim);letter-spacing:0.14em;text-transform:uppercase}
+.p-lc .val{font-size:33px;font-weight:300}
+.p-pvb{font-size:15px;color:var(--p-dim);margin-bottom:8px}
+.p-pvb b{color:#f1f5f9}
+.p-prr{width:200px;min-width:180px;background:#0f172a;border-left:1px solid #1e293b;display:flex;flex-direction:column;padding:10px 10px 6px;gap:6px}
+.p-rb{background:#080e1a;border-radius:10px;border:1px solid #1e293b;padding:10px 12px}
+.p-rb .lbl{font-size:13px;letter-spacing:0.16em;color:var(--gold);text-transform:uppercase;margin-bottom:3px;opacity:0.8}
+.p-rar{display:flex;align-items:baseline;gap:6px}
+.p-aa{font-size:42px;line-height:1}
+.p-an{font-size:72px;font-weight:300;line-height:1;font-variant-numeric:tabular-nums;color:#f1f5f9}
+.p-as{font-size:15px;color:var(--p-dim);margin-top:2px}
+.p-ac{font-size:15px;color:var(--p-dim);margin-top:2px}
+.p-pn{font-size:63px;font-weight:300;line-height:1;font-variant-numeric:tabular-nums}
+.p-pd{font-size:15px;color:var(--p-dim);margin-top:2px}
+.p-pbw{height:4px;background:#334155;border-radius:99px;overflow:hidden;margin-top:8px}
+.p-pbf{height:100%;border-radius:99px;transition:width 0.35s,background 0.35s}
+.p-mp{background:#080e1a;border-radius:10px;border:1px solid rgba(124,58,237,0.27);padding:10px;display:none;flex-direction:column;gap:8px;overflow-y:auto}
+.p-mp.open{display:flex}
+.p-ml{font-size:13px;color:#a78bfa;letter-spacing:0.14em;text-transform:uppercase}
+.p-tr{display:flex;background:#0f172a;border-radius:8px;border:1px solid #1e293b;overflow:hidden}
+.p-tb{flex:1;height:30px;border:none;cursor:pointer;font-size:15px;font-weight:500;background:none;color:var(--p-dim);transition:all 0.15s}
+.p-tb.active{background:#1d4ed8;color:#fff;border-radius:6px}
+
+/* ═══════════════════════ SHORT GAME MODULE ═══════════════════════ */
+#module-shortgame{background:#0a0f0d;color:#e8f0ea;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.a-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid #1f2e23;position:sticky;top:0;z-index:10;background:#0a0f0d}
+.a-logo{font-family:'DM Sans',sans-serif;font-size:22px;font-weight:300;letter-spacing:0.2em;color:#f0ede6;text-transform:uppercase}
+.a-logo-dot{display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--gold);margin:0 8px 2px;vertical-align:middle}
+.a-logo-s{color:var(--gold);font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.14em;opacity:0.85;text-transform:uppercase}
+.a-hr{display:flex;align-items:center;gap:8px}
+.a-htag{font-size:18px;line-height:1;flex-shrink:0}
+.a-main{padding:16px 16px 100px;max-width:520px;margin:0 auto}
+.a-sl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;margin-top:20px;opacity:0.85}
+.a-sl:first-child{margin-top:0}
+.a-rd{display:inline-block;width:6px;height:6px;border-radius:50%;background:#3a4f3d;margin-left:6px;vertical-align:middle;transition:background 0.2s}
+.a-rd.filled{background:#4ade80}
+.a-dc{background:#111a14;border:1px solid #1f2e23;border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px}
+.a-diw{flex:1;position:relative}
+.a-din{width:100%;background:#0a0f0d;border:1px solid #1f2e23;border-radius:10px;padding:12px 48px 12px 16px;font-size:32px;font-weight:300;font-family:'DM Mono',monospace;color:#e8f0ea;outline:none;-webkit-appearance:none;appearance:none}
+.a-din:focus{border-color:#16a34a;box-shadow:0 0 0 2px rgba(74,222,128,0.1)}
+.a-din::placeholder{color:#3a4f3d}
+.a-diu{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:13px;color:var(--a-dim);pointer-events:none}
+.a-cg{display:grid;gap:8px}
+.a-cg.c2{grid-template-columns:1fr 1fr}
+.a-cg.c3{grid-template-columns:1fr 1fr 1fr}
+.a-ch{background:#111a14;border:1.5px solid #1f2e23;border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.15s;user-select:none}
+.a-ch:active{transform:scale(0.96)}
+.a-ch .ci{font-size:22px;display:block;margin-bottom:4px}
+.a-ch .cl{font-size:12px;font-weight:500;color:var(--a-dim);line-height:1.2}
+.a-ch.selected{background:#1a3324;border-color:#16a34a}
+.a-ch.selected .cl{color:#4ade80}
+.a-ld{margin-top:8px;display:none}
+.a-ld.vis{display:block}
+.a-ldl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.14em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;opacity:0.85}
+.a-sc{background:#111a14;border:1.5px solid #1f2e23;border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all 0.15s;user-select:none}
+.a-sc:active{transform:scale(0.96)}
+.a-sc .ci{font-size:20px;display:block;margin-bottom:3px}
+.a-sc .cl{font-size:11px;font-weight:500;color:var(--a-dim);line-height:1.2}
+.a-sc.selected{background:#1a3324;border-color:#16a34a}
+.a-sc.selected .cl{color:#4ade80}
+.a-oc{background:#111a14;border:1.5px solid #1f2e23;border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.15s;user-select:none}
+.a-oc:active{transform:scale(0.96)}
+.a-oc .ci{font-size:20px;display:block;margin-bottom:4px}
+.a-oc .cl{font-size:12px;font-weight:500;color:var(--a-dim);line-height:1.2}
+.a-oc.selected{background:#2a1a0a;border-color:#b45309}
+.a-oc.selected .cl{color:#fbbf24}
+.a-cta{position:fixed;bottom:0;left:0;right:0;padding:12px 16px 28px;background:linear-gradient(transparent,#0a0f0d 40%);max-width:520px;margin:0 auto}
+@media(min-width:520px){.a-cta{left:50%;right:auto;transform:translateX(-50%);width:520px}}
+.a-ctab{width:100%;height:58px;background:#16a34a;border:1px solid rgba(74,222,128,0.3);border-radius:14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:17px;font-weight:500;letter-spacing:0.08em;cursor:pointer;transition:opacity 0.15s,transform 0.1s;display:flex;align-items:center;justify-content:center;gap:10px}
+.a-ctab:active{transform:scale(0.98);opacity:0.85}
+.a-ctab:disabled{opacity:0.35;pointer-events:none}
+</style>
+</head>
+<body>
+<!-- INSTRUCTION OVERLAY -->
+<div id="instr-overlay">
+  <div class="instr-hdr">
+    <button class="instr-back" onclick="closeInstr()">&#8592;</button>
+    <div class="instr-htitle" id="instr-title">Instructions</div>
+  </div>
+  <div class="instr-body" id="instr-body"></div>
+</div>
+
+<!-- ═══ MENU MODULE ═══ -->
+<div id="module-menu" class="module active">
+  <div class="menu-bg"></div>
+  <div class="menu-overlay"></div>
+  <div class="menu-inner">
+    <div class="menu-lang-row">
+      <div class="lang-bar">
+        <button class="lang-flag active" id="ml-en" onclick="setLang('en')">&#127482;&#127480;</button>
+        <button class="lang-flag" id="ml-zh" onclick="setLang('zh')">&#127481;&#127484;</button>
+        <button class="lang-flag" id="ml-ja" onclick="setLang('ja')">&#127471;&#127477;</button>
+        <button class="lang-flag" id="ml-ko" onclick="setLang('ko')">&#127472;&#127479;</button>
+      </div>
+    </div>
+    <div class="menu-logo-wrap">
+      <div class="menu-logo-ring">
+        <img class="menu-logo-img" src="logo.png" alt="Accadie"/>
+      </div>
+      <div class="menu-brand-name">Accadie</div>
+      <div class="menu-brand-rule"></div>
+      <div class="menu-brand-sub" id="m-sub">Your Golf Caddie</div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-sec" id="m-tools">TOOLS</div>
+      <button class="menu-card mc-sg" onclick="launch('shortgame')">
+        <div class="mc-icon">&#127948;&#65039;</div>
+        <div class="mc-text">
+          <div class="mc-title lg" id="m-sg-t">Short Game Advisor</div>
+          <div class="mc-desc" id="m-sg-d">Club selection &amp; shot technique for approach shots</div>
+        </div>
+        <div class="mc-arr">&#8250;</div>
+      </button>
+      <button class="menu-card mc-put" onclick="launch('putting')">
+        <div class="mc-icon">&#9971;</div>
+        <div class="mc-text">
+          <div class="mc-title lg" id="m-put-t">Putting Advisor</div>
+          <div class="mc-desc" id="m-put-d">Green slope reading &amp; aim &amp; pace calculation</div>
+        </div>
+        <div class="mc-arr">&#8250;</div>
+      </button>
+      <div class="menu-sec" id="m-guides">INSTRUCTIONS</div>
+      <button class="menu-card mc-instr" onclick="openInstr('shortgame')">
+        <div class="mc-icon sm">&#128218;</div>
+        <div class="mc-text">
+          <div class="mc-title" id="m-isg-t">Short Game Guide</div>
+          <div class="mc-desc" id="m-isg-d">How to use the Short Game Advisor</div>
+        </div>
+        <div class="mc-arr">&#8250;</div>
+      </button>
+      <button class="menu-card mc-instr" onclick="openInstr('putting')">
+        <div class="mc-icon sm">&#128218;</div>
+        <div class="mc-text">
+          <div class="mc-title" id="m-ip-t">Putting Guide</div>
+          <div class="mc-desc" id="m-ip-d">How to use the Putting Advisor</div>
+        </div>
+        <div class="mc-arr">&#8250;</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PUTTING MODULE ═══ -->
+<div id="module-putting" class="module">
+  <!-- Permission -->
+  <div id="p-perm" class="p-sl p-perm">
+    <div class="lang-bar" style="position:absolute;top:16px;left:16px">
+      <button class="lang-flag active" id="pp-en" onclick="setLang('en')">&#127482;&#127480;</button>
+      <button class="lang-flag" id="pp-zh" onclick="setLang('zh')">&#127481;&#127484;</button>
+      <button class="lang-flag" id="pp-ja" onclick="setLang('ja')">&#127471;&#127477;</button>
+      <button class="lang-flag" id="pp-ko" onclick="setLang('ko')">&#127472;&#127479;</button>
+    </div>
+    <button class="p-smb" style="position:absolute;top:16px;right:16px;width:auto;padding:0 14px;height:32px;font-size:14px" onclick="goMenu()">&#8592; Menu</button>
+    <div style="font-size:13px;letter-spacing:0.22em;color:var(--p-dim);text-transform:uppercase" data-pi="greenReader">Green Reader</div>
+    <h1>&#9971; <span data-pi="appTitle">Putting</span></h1>
+    <p data-pi="permissionDesc">Uses your phone's motion sensors to measure green slope.<br/><br/>Allow motion access when prompted.</p>
+    <button class="p-smb blue" style="width:220px;height:48px;font-size:22px" onclick="pReqPerm()" data-pi="enableSensors">Enable Motion Sensors</button>
+  </div>
+  <!-- Rotate -->
+  <div id="p-rot" class="p-sl p-rot hidden">
+    <div class="lang-bar" style="position:absolute;top:16px;left:16px">
+      <button class="lang-flag active" id="pr-en" onclick="setLang('en')">&#127482;&#127480;</button>
+      <button class="lang-flag" id="pr-zh" onclick="setLang('zh')">&#127481;&#127484;</button>
+      <button class="lang-flag" id="pr-ja" onclick="setLang('ja')">&#127471;&#127477;</button>
+      <button class="lang-flag" id="pr-ko" onclick="setLang('ko')">&#127472;&#127479;</button>
+    </div>
+    <div class="p-ri">&#128241;</div>
+    <h2 data-pi="rotateTitle">Rotate to Landscape</h2>
+    <p data-pi="rotateDesc">Rotate phone so the bottom (home button) is on your right.</p>
+  </div>
+  <!-- Calibration -->
+  <div id="p-calsc" class="p-sl p-cal hidden">
+    <div class="lang-bar" style="position:absolute;top:16px;left:16px">
+      <button class="lang-flag active" id="pc-en" onclick="setLang('en')">&#127482;&#127480;</button>
+      <button class="lang-flag" id="pc-zh" onclick="setLang('zh')">&#127481;&#127484;</button>
+      <button class="lang-flag" id="pc-ja" onclick="setLang('ja')">&#127471;&#127477;</button>
+      <button class="lang-flag" id="pc-ko" onclick="setLang('ko')">&#127472;&#127479;</button>
+    </div>
+    <button class="p-smb" style="position:absolute;top:16px;right:16px;width:auto;padding:0 14px;height:32px;font-size:14px" onclick="goMenu()">&#8592; Menu</button>
+    <div id="p-cal-idle">
+      <div style="font-size:13px;letter-spacing:0.22em;color:var(--p-dim);text-transform:uppercase;margin-bottom:10px" data-pi="calTitle">Green Reader · Calibration</div>
+      <h2 style="margin-bottom:14px" data-pi="calHeading">&#128208; Calibrate Sensor</h2>
+      <p style="margin-bottom:20px" data-pi="calDesc">Place phone flat on a table and press Calibrate.</p>
+      <div id="p-csb-el" class="p-csb hidden" style="margin-bottom:18px">
+        <div class="p-cg" data-pi="calSaved">&#10003; Calibration saved</div>
+        <div><span data-pi="side">Side</span>: <b id="p-csb-s">&#8212;</b> &nbsp;|&nbsp; <span data-pi="tilt">Tilt</span>: <b id="p-csb-u">&#8212;</b></div>
+        <div class="p-cts" id="p-csb-ts">&#8212;</div>
+      </div>
+      <button class="p-smb blue" style="width:280px;height:64px;font-size:24px;margin-bottom:14px" onclick="pStartCal()" data-pi="calBtn">&#128208; Calibrate</button>
+      <button class="p-smb" id="p-skip" style="width:280px;height:56px;font-size:22px;visibility:hidden" onclick="pFinishCal()" data-pi="calSkip">Skip &#8594;</button>
+    </div>
+    <div id="p-cal-act" class="hidden">
+      <div style="font-size:13px;letter-spacing:0.14em;color:var(--p-dim);text-transform:uppercase;margin-bottom:14px" data-pi="calActiveDesc">Keep phone flat &amp; still on the table</div>
+      <div class="p-cab">
+        <div class="p-cc" id="p-cal-cd">8</div>
+        <div class="p-cst" id="p-cal-st" data-pi="calWaiting">Waiting&#8230;</div>
+      </div>
+      <button class="p-smb" style="width:200px;height:52px;font-size:20px;margin-top:24px;background:#b91c1c;color:#fff;border-color:#b91c1c" onclick="pCancelCal()" data-pi="cancel">Cancel</button>
+    </div>
+  </div>
+  <!-- App Root -->
+  <div id="p-ar">
+    <div style="display:flex;flex-direction:row;width:100%;height:100%">
+      <!-- LEFT PANEL -->
+      <div class="p-pl">
+        <div class="lang-bar">
+          <button class="lang-flag active" id="pa-en" onclick="setLang('en')">&#127482;&#127480;</button>
+          <button class="lang-flag" id="pa-zh" onclick="setLang('zh')">&#127481;&#127484;</button>
+          <button class="lang-flag" id="pa-ja" onclick="setLang('ja')">&#127471;&#127477;</button>
+          <button class="lang-flag" id="pa-ko" onclick="setLang('ko')">&#127472;&#127479;</button>
+        </div>
+        <div class="p-at" data-pi="appTitle">&#9971; Putting</div>
+        <div class="p-lb">
+          <div class="p-bl" data-pi="length">Length (paces)</div>
+          <div class="p-si">
+            <button class="p-nb" style="width:34px;height:34px;font-size:30px" onclick="pAdjLen(-0.5)">&#8722;</button>
+            <div class="p-nv" id="p-len" onclick="pEdit('length')">3.0</div>
+            <button class="p-nb" style="width:34px;height:34px;font-size:30px" onclick="pAdjLen(0.5)">+</button>
+          </div>
+        </div>
+        <div class="p-sb">
+          <div class="p-bl" data-pi="stimp">Stimp</div>
+          <div class="p-si">
+            <button class="p-nb" style="width:26px;height:26px;font-size:21px" onclick="pAdjStimp(-0.5)">&#8722;</button>
+            <div class="p-nv" style="font-size:33px" id="p-stimp" onclick="pEdit('stimp')">10.0</div>
+            <button class="p-nb" style="width:26px;height:26px;font-size:21px" onclick="pAdjStimp(0.5)">+</button>
+          </div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="p-lb2">
+          <button class="p-smb blue" id="p-read" onclick="pStartRead()" data-pi="readSlope">Read Slope</button>
+          <button class="p-smb grn hidden" id="p-lock" onclick="pLock()" data-pi="lock">Lock &#10003;</button>
+          <button class="p-smb hidden" id="p-avg" onclick="pAvg()" data-pi="avg">Avg &#8960;</button>
+          <button class="p-smb hidden" id="p-new" onclick="pStartRead()" data-pi="newReading">New Reading</button>
+          <button class="p-smb hidden" id="p-reset" onclick="pReset()" data-pi="reset">Reset</button>
+          <button class="p-smb" id="p-manual" onclick="pToggleMan()" data-pi="manual">&#9998; Manual</button>
+
+        </div>
+      </div>
+      <!-- CENTER PANEL -->
+      <div class="p-pc">
+        <div class="p-ag"><div class="p-aft">&#128681;</div><div class="p-avl"></div><div class="p-abb">&#9898;</div></div>
+        <div id="p-s-ready" style="text-align:center"><div style="font-size:20px;color:var(--p-dim)" data-pi="readyHint">Press <b style="color:#f1f5f9">Read Slope</b> to start</div></div>
+        <div id="p-s-reading" class="hidden" style="width:100%">
+          <div class="p-stl" data-pi="liveLabel">Live · Hold Still</div>
+          <div class="p-lg">
+            <div class="p-lbx"><div class="lbl" data-pi="sideSlope">Side Slope</div><div class="val p-cs2" id="p-ls">&#8212;</div><div class="sub" id="p-lsd">&#8212;</div></div>
+            <div class="p-lbx"><div class="lbl" data-pi="upDown">Up / Down</div><div class="val p-cu" id="p-lu">&#8212;</div><div class="sub" id="p-lud">&#8212;</div></div>
+          </div>
+        </div>
+        <div id="p-s-locked" class="hidden" style="width:100%">
+          <div class="p-stl" data-pi="lockedLabel">Locked Reading</div>
+          <div class="p-lr">
+            <div class="p-lc"><div class="lbl" data-pi="side">Side</div><div class="val p-cs2" id="p-lks">&#8212;</div></div>
+            <div class="p-lc"><div class="lbl" data-pi="upDown">Up/Down</div><div class="val p-cu" id="p-lku">&#8212;</div></div>
+          </div>
+          <div class="p-pvb hidden" id="p-prev"><span data-pi="prev">Prev</span>: <b id="p-psv">&#8212;</b> / <b id="p-puv">&#8212;</b></div>
+        </div>
+        <div id="p-manp" class="p-mp" style="width:100%;margin-top:8px">
+          <div class="p-ml" data-pi="manualOverride">&#9888; Manual Override</div>
+          <div>
+            <div class="p-ml" style="margin-bottom:3px" data-pi="sideSlope">Side Slope %</div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <button class="p-nb" style="width:28px;height:28px;font-size:21px" onclick="pAdjMS(-0.1)">&#8722;</button>
+              <div style="flex:1;text-align:center;font-size:27px;font-weight:700;color:#f1f5f9" id="p-msv">1.0%</div>
+              <button class="p-nb" style="width:28px;height:28px;font-size:21px" onclick="pAdjMS(0.1)">+</button>
+            </div>
+          </div>
+          <div>
+            <div class="p-ml" style="margin-bottom:3px" data-pi="breakDir">Break Direction</div>
+            <div class="p-tr">
+              <button class="p-tb" id="p-togL" onclick="pSetMSD('L')" data-pi="rToL">&#8592; R to L</button>
+              <button class="p-tb active" id="p-togR" onclick="pSetMSD('R')" data-pi="lToR">L to R &#8594;</button>
+            </div>
+          </div>
+          <div>
+            <div class="p-ml" style="margin-bottom:3px" data-pi="upDownhill">Up / Downhill</div>
+            <div class="p-tr">
+              <button class="p-tb" id="p-togUp" onclick="pSetMUD('uphill')" data-pi="up">&#11014; Up</button>
+              <button class="p-tb active" id="p-togFl" onclick="pSetMUD('flat')" data-pi="flat">&#8212; Flat</button>
+              <button class="p-tb" id="p-togDn" onclick="pSetMUD('downhill')" data-pi="down">&#11015; Down</button>
+            </div>
+          </div>
+          <div id="p-muw" style="display:none">
+            <div class="p-ml" style="margin-bottom:3px" data-pi="upDownPct">Up/Down %</div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <button class="p-nb" style="width:28px;height:28px;font-size:21px" onclick="pAdjMU(-0.1)">&#8722;</button>
+              <div style="flex:1;text-align:center;font-size:27px;font-weight:700;color:#f1f5f9" id="p-muv">1.0%</div>
+              <button class="p-nb" style="width:28px;height:28px;font-size:21px" onclick="pAdjMU(0.1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT PANEL -->
+      <div class="p-prr">
+        <div style="font-size:13px;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;opacity:0.85" data-pi="result">Result</div>
+        <div class="p-rb" style="flex:1">
+          <div class="lbl" data-pi="aim">Aim</div>
+          <div class="p-rar"><span class="p-aa" id="p-aim-arr" style="color:#3b82f6">&#8212;</span><span class="p-an" id="p-aim-n">&#8212;</span></div>
+          <div class="p-as" id="p-aim-s" data-pi="aimHint">Set length &amp; read slope</div>
+          <div class="p-ac" id="p-aim-c">&#8212;</div>
+        </div>
+        <div class="p-rb" style="flex:1">
+          <div class="lbl" data-pi="pace">Pace</div>
+          <div class="p-pn" id="p-pace-n" style="color:#8a9e8c">&#8212;</div>
+          <div class="p-pd" id="p-pace-d" style="margin-top:4px;font-size:18px">&#8212;</div>
+          <div class="p-pbw"><div class="p-pbf" id="p-pace-b" style="width:0%;background:#334155"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="switch-btn" id="p-sw" onclick="launch('shortgame')" title="Short Game Advisor">&#127948;&#65039;</button>
+  <button class="switch-btn" style="right:76px" onclick="goMenu()" title="Menu">&#128682;</button>
+</div>
+
+<!-- ═══ SHORT GAME MODULE ═══ -->
+<div id="module-shortgame" class="module">
+  <div class="a-hdr">
+    <div class="a-logo">Accadie<span class="a-logo-dot"></span><span class="a-logo-s" id="a-logo-s">Short Game</span></div>
+    <div class="a-hr">
+      <div class="lang-bar">
+        <button class="lang-flag active" id="al-en" onclick="setLang('en')">&#127482;&#127480;</button>
+        <button class="lang-flag" id="al-zh" onclick="setLang('zh')">&#127481;&#127484;</button>
+        <button class="lang-flag" id="al-ja" onclick="setLang('ja')">&#127471;&#127477;</button>
+        <button class="lang-flag" id="al-ko" onclick="setLang('ko')">&#127472;&#127479;</button>
+      </div>
+      <div class="a-htag" id="a-htag">&#127948;&#65039;</div>
+      <button style="background:rgba(255,255,255,0.05);border:1px solid #1f2e23;border-radius:8px;color:var(--a-dim);font-size:13px;padding:4px 10px;height:30px;cursor:pointer" onclick="goMenu()">&#8592;</button>
+    </div>
+  </div>
+  <!-- INPUT -->
+  <div id="a-in">
+    <div class="a-main">
+      <div class="a-sl" id="a-ld-lbl">Distance to green <span class="a-rd" id="a-dot-d"></span></div>
+      <div class="a-dc">
+        <div style="font-size:28px;flex-shrink:0">&#128205;</div>
+        <div class="a-diw">
+          <input class="a-din" id="a-dist" type="number" inputmode="numeric" placeholder="0" min="1" max="100" oninput="aOnDist()"/>
+          <span class="a-diu">yds</span>
+        </div>
+      </div>
+      <div class="a-sl" id="a-lie-lbl">Lie <span class="a-rd" id="a-dot-l"></span></div>
+      <div class="a-cg c3">
+        <div class="a-ch" data-g="lie" data-v="fairway" onclick="aSel(this)"><span class="ci">&#127807;</span><span class="cl" id="ac-fw">Fairway / Fringe</span></div>
+        <div class="a-ch" data-g="lie" data-v="rough-light" onclick="aSel(this)"><span class="ci">&#127806;</span><span class="cl" id="ac-rl">Light Rough</span></div>
+        <div class="a-ch" data-g="lie" data-v="rough-deep" onclick="aSel(this)"><span class="ci">&#127795;</span><span class="cl" id="ac-rdp">Deep Rough</span></div>
+        <div class="a-ch" data-g="lie" data-v="sand" onclick="aSel(this)"><span class="ci">&#127958;</span><span class="cl" id="ac-sa">Sand / Bunker</span></div>
+        <div class="a-ch" data-g="lie" data-v="water" onclick="aSel(this)"><span class="ci">&#128167;</span><span class="cl" id="ac-wa">Shallow Water</span></div>
+        <div class="a-ch" data-g="lie" data-v="hardpan" onclick="aSel(this)"><span class="ci">&#129704;</span><span class="cl" id="ac-hp">Hardpan / Bare</span></div>
+      </div>
+      <div class="a-ld" id="a-det-rough">
+        <div class="a-ldl" id="a-ldl-r">&#8627; Rough type</div>
+        <div class="a-cg c3">
+          <div class="a-ch" data-g="det" data-v="with-grain" onclick="aSel(this)"><span class="ci">&#10145;</span><span class="cl" id="ac-wg">With Grain</span></div>
+          <div class="a-ch" data-g="det" data-v="against-grain" onclick="aSel(this)"><span class="ci">&#11013;</span><span class="cl" id="ac-ag">Against Grain</span></div>
+          <div class="a-ch" data-g="det" data-v="vertical" onclick="aSel(this)"><span class="ci">&#11015;</span><span class="cl" id="ac-vt">Vertical / Matted</span></div>
+        </div>
+      </div>
+      <div class="a-ld" id="a-det-sand">
+        <div class="a-ldl" id="a-ldl-s">&#8627; Sand lie</div>
+        <div class="a-cg c2">
+          <div class="a-ch" data-g="det" data-v="sand-clean" onclick="aSel(this)"><span class="ci">&#9989;</span><span class="cl" id="ac-scl">Clean / Sitting up</span></div>
+          <div class="a-ch" data-g="det" data-v="sand-third" onclick="aSel(this)"><span class="ci">&#128317;</span><span class="cl" id="ac-st">&#8531; Buried</span></div>
+          <div class="a-ch" data-g="det" data-v="sand-fried" onclick="aSel(this)"><span class="ci">&#127859;</span><span class="cl" id="ac-sf">Fried Egg</span></div>
+          <div class="a-ch" data-g="det" data-v="sand-buried" onclick="aSel(this)"><span class="ci">&#10060;</span><span class="cl" id="ac-sb">Fully Buried</span></div>
+          <div class="a-ch" data-g="det" data-v="sand-plug" onclick="aSel(this)"><span class="ci">&#128274;</span><span class="cl" id="ac-sp">Deep Plug</span></div>
+          <div class="a-ch" data-g="det" data-v="sand-chip" onclick="aSel(this)"><span class="ci">&#127948;</span><span class="cl" id="ac-sc2">Near Edge (chip out)</span></div>
+        </div>
+      </div>
+      <div class="a-ld" id="a-det-water">
+        <div class="a-ldl" id="a-ldl-w">&#8627; Water depth</div>
+        <div class="a-cg c3">
+          <div class="a-ch" data-g="det" data-v="water-third" onclick="aSel(this)"><span class="ci">&#128167;</span><span class="cl" id="ac-wt">&#8531; Submerged</span></div>
+          <div class="a-ch" data-g="det" data-v="water-two-thirds" onclick="aSel(this)"><span class="ci">&#127754;</span><span class="cl" id="ac-w2">&#8532; Submerged</span></div>
+          <div class="a-ch" data-g="det" data-v="water-full" onclick="aSel(this)"><span class="ci">&#127944;</span><span class="cl" id="ac-wf">Fully Under (&lt;2&quot;)</span></div>
+        </div>
+      </div>
+      <div class="a-sl" id="a-slp-lbl">Slope &amp; stance <span class="a-rd" id="a-dot-s"></span></div>
+      <div class="a-cg c3">
+        <div class="a-sc" data-g="slope" data-v="flat" onclick="aSel(this)"><span class="ci">&#10134;</span><span class="cl" id="ac-fl">Flat</span></div>
+        <div class="a-sc" data-g="slope" data-v="uphill" onclick="aSel(this)"><span class="ci">&#11014;</span><span class="cl" id="ac-uh">Uphill</span></div>
+        <div class="a-sc" data-g="slope" data-v="downhill" onclick="aSel(this)"><span class="ci">&#11015;</span><span class="cl" id="ac-dh">Downhill</span></div>
+        <div class="a-sc" data-g="slope" data-v="ball-above" onclick="aSel(this)"><span class="ci">&#8598;</span><span class="cl" id="ac-ba">Ball Above Feet</span></div>
+        <div class="a-sc" data-g="slope" data-v="ball-below" onclick="aSel(this)"><span class="ci">&#8600;</span><span class="cl" id="ac-bb">Ball Below Feet</span></div>
+        <div class="a-sc" style="visibility:hidden;pointer-events:none"></div>
+      </div>
+      <div class="a-sl" id="a-obs-lbl">Obstacles</div>
+      <div class="a-cg c3">
+        <div class="a-oc selected" data-g="obs" data-v="none" onclick="aSel(this)"><span class="ci">&#9989;</span><span class="cl" id="ac-on">None</span></div>
+        <div class="a-oc" data-g="obs" data-v="carry" onclick="aSel(this)"><span class="ci">&#9760;</span><span class="cl" id="ac-haz">Hazard</span></div>
+        <div class="a-oc" data-g="obs" data-v="tree" onclick="aSel(this)"><span class="ci">&#127794;</span><span class="cl" id="ac-tr">Tree / Low Ceiling</span></div>
+      </div>
+    </div>
+    <div class="a-cta">
+      <button class="a-ctab" id="a-cta" disabled onclick="aGetAdvice()">
+        <span>&#127919;</span> <span id="a-cta-lbl">Get Advice</span>
+      </button>
+    </div>
+  </div>
+  <!-- OUTPUT -->
+  <div id="a-out" class="hidden">
+    <div class="a-main" style="padding-top:16px;padding-bottom:110px">
+      <div id="a-sitbar" style="background:#162019;border:1px solid #1f2e23;border-radius:10px;padding:8px 14px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:0.08em;margin-bottom:14px;opacity:0.85"></div>
+      <div style="background:#111a14;border:1px solid #1f2e23;border-radius:14px;padding:16px;margin-bottom:10px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;opacity:0.85" id="a-lbl-shot">Recommended Shot</div>
+        <div id="a-shot-n" style="font-family:'DM Sans',sans-serif;font-size:34px;font-weight:300;color:#4ade80;letter-spacing:0.04em;line-height:1.1;margin-bottom:10px"></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">&#127948;</span>
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:0.14em;text-transform:uppercase;opacity:0.85" id="a-lbl-club">Club</div>
+            <div id="a-club" style="font-size:16px;font-weight:500;color:#e8f0ea"></div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#111a14;border:1px solid #1f2e23;border-radius:14px;padding:16px;margin-bottom:10px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;opacity:0.85" id="a-lbl-how">How To Play It</div>
+        <div id="a-instrs"></div>
+      </div>
+      <div id="a-slope-card" style="background:#0f1f14;border:1px solid #1a3a22;border-radius:14px;padding:14px 16px;margin-bottom:10px;display:none">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;opacity:0.85" id="a-lbl-slp">&#9968; Slope Adjustment</div>
+        <div id="a-slope-txt" style="font-size:14px;color:#e8f0ea;line-height:1.6"></div>
+      </div>
+      <div id="a-warn-card" style="background:#1a1000;border:1px solid #78350f;border-radius:14px;padding:14px 16px;margin-bottom:10px;display:none">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.22em;color:#fbbf24;text-transform:uppercase;margin-bottom:6px;opacity:0.9" id="a-lbl-warn">&#9888; Heads Up</div>
+        <div id="a-warn-txt" style="font-size:14px;color:#e8f0ea;line-height:1.6"></div>
+      </div>
+    </div>
+    <div class="a-cta">
+      <div style="display:flex;gap:10px">
+        <button onclick="aGoBack()" style="flex:1;height:52px;background:#111a14;border:1px solid #1f2e23;border-radius:12px;color:#e8f0ea;font-size:15px;font-weight:500;cursor:pointer" id="a-btn-edit">&#8592; Edit</button>
+        <button onclick="aReset()" style="flex:1;height:52px;background:#16a34a;border:1px solid rgba(74,222,128,0.3);border-radius:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;letter-spacing:0.06em;cursor:pointer" id="a-btn-new">&#8635; New Shot</button>
+      </div>
+    </div>
+  </div>
+  <button class="switch-btn" id="a-sw" onclick="launch('putting')" title="Putting Advisor">&#9971;</button>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════
+//  LANGUAGE SYSTEM
+// ═══════════════════════════════════════════════════════
+var lang = 'en';
+
+var ML = {
+  en:{sub:'Your Golf Caddie',tools:'TOOLS',guides:'INSTRUCTIONS',
+    sgT:'Short Game Advisor',sgD:'Club selection & shot technique for approach shots',
+    putT:'Putting Advisor',putD:'Green slope reading & aim & pace calculation',
+    isgT:'Short Game Guide',isgD:'How to use the Short Game Advisor',
+    ipT:'Putting Guide',ipD:'How to use the Putting Advisor',
+    isgH:'Short Game Advisor — Instructions',ipH:'Putting Advisor — Instructions'},
+  zh:{sub:'您的高爾夫球桿弟',tools:'工具',guides:'使用說明',
+    sgT:'短打顧問',sgD:'球桿選擇和近洞擊球技術',
+    putT:'推桿顧問',putD:'果嶺坡度讀取、瞄準方向和推桿力度計算',
+    isgT:'短打指南',isgD:'如何使用短打顧問',
+    ipT:'推桿指南',ipD:'如何使用推桿顧問',
+    isgH:'短打顧問 — 使用說明',ipH:'推桿顧問 — 使用說明'},
+  ja:{sub:'あなたのゴルフキャディ',tools:'ツール',guides:'使用説明',
+    sgT:'ショートゲーム・アドバイザー',sgD:'クラブ選択とショット技術のアドバイス',
+    putT:'パッティング・アドバイザー',putD:'グリーン傾斜読み・エイム・ペース計算',
+    isgT:'ショートゲーム・ガイド',isgD:'ショートゲームアドバイザーの使い方',
+    ipT:'パッティング・ガイド',ipD:'パッティングアドバイザーの使い方',
+    isgH:'ショートゲーム・アドバイザー — 使用説明書',ipH:'パッティング・アドバイザー — 使用説明書'},
+  ko:{sub:'당신의 골프 캐디',tools:'도구',guides:'사용 설명서',
+    sgT:'숏게임 어드바이저',sgD:'클럽 선택 및 어프로치 샷 기술',
+    putT:'퍼팅 어드바이저',putD:'그린 경사 읽기 · 조준 · 페이스 계산',
+    isgT:'숏게임 가이드',isgD:'숏게임 어드바이저 사용 방법',
+    ipT:'퍼팅 가이드',ipD:'퍼팅 어드바이저 사용 방법',
+    isgH:'숏게임 어드바이저 — 사용 설명서',ipH:'퍼팅 어드바이저 — 사용 설명서'}
+};
+
+var PL = {
+  en:{appTitle:'⛳ Putting',greenReader:'Green Reader',
+    permissionDesc:"Uses your phone's motion sensors to measure green slope.<br/><br/>Allow motion access when prompted.",
+    enableSensors:'Enable Motion Sensors',rotateTitle:'Rotate to Landscape',
+    rotateDesc:'Rotate phone so the bottom (home button) is on your right.',
+    calTitle:'Green Reader · Calibration',calHeading:'📐 Calibrate Sensor',
+    calDesc:'Place phone flat on a table and press Calibrate.',
+    calSaved:'✓ Calibration saved',calBtn:'📐 Calibrate',calSkip:'Skip →',
+    calActiveDesc:'Keep phone flat & still on the table',
+    calWaiting:'Waiting for stable reading…',cancel:'Cancel',
+    length:'Length (paces)',stimp:'Stimp',readSlope:'Read Slope',lock:'Lock ✓',
+    avg:'Avg ⌀',newReading:'New Reading',reset:'Reset',manual:'✏ Manual',
+    readyHint:'Press <b style="color:#f1f5f9;">Read Slope</b> to start',
+    liveLabel:'Live · Hold Still',sideSlope:'Side Slope',upDown:'Up / Down',
+    lockedLabel:'Locked Reading',side:'Side',prev:'Prev',tilt:'Tilt',
+    manualOverride:'⚠ Manual Override',breakDir:'Break Direction',
+    rToL:'← R to L',lToR:'L to R →',upDownhill:'Up / Downhill',
+    up:'⬆ Up',flat:'— Flat',down:'⬇ Down',upDownPct:'Up/Down %',
+    result:'Result',aim:'Aim',aimHint:'Set length & read slope',pace:'Pace',
+    aimRight:'Aim Right →',aimLeft:'← Aim Left',straight:'Straight',
+    leftOfPin:'Left of pin',rightOfPin:'Right of pin',
+    uphill:'⬆ Uphill',downhill:'⬇ Downhill',flatDir:'— Flat',
+    manualHide:'✕ Hide Manual',calStable:'Gathering data…',
+    calUnstable:'⚠ Keep phone still…',saved:'Saved'},
+  zh:{appTitle:'⛳ 推桿',greenReader:'果嶺讀取',
+    permissionDesc:'使用手機的動作感應器測量果嶺坡度。<br/><br/>請在提示時允許動作存取。',
+    enableSensors:'啟用動作感應器',rotateTitle:'旋轉至橫向',
+    rotateDesc:'請將手機旋轉，使底部（Home鍵）在右側。',
+    calTitle:'果嶺讀取 · 校準',calHeading:'📐 感應器校準',
+    calDesc:'將手機平放在桌上，然後按校準。',
+    calSaved:'✓ 校準已儲存',calBtn:'📐 校準',calSkip:'跳過 →',
+    calActiveDesc:'保持手機平放且靜止在桌上',
+    calWaiting:'等待穩定讀數…',cancel:'取消',
+    length:'距離（步）',stimp:'Stimp',readSlope:'讀取坡度',lock:'鎖定 ✓',
+    avg:'平均 ⌀',newReading:'新讀數',reset:'重置',manual:'✏ 手動',
+    readyHint:'按下 <b style="color:#f1f5f9;">讀取坡度</b> 開始',
+    liveLabel:'即時 · 保持靜止',sideSlope:'側坡',upDown:'上坡/下坡',
+    lockedLabel:'已鎖定讀數',side:'側面',prev:'上次',tilt:'傾斜',
+    manualOverride:'⚠ 手動輸入',breakDir:'偏斜方向',
+    rToL:'← 右至左',lToR:'左至右 →',upDownhill:'上坡/下坡',
+    up:'⬆ 上坡',flat:'— 平坦',down:'⬇ 下坡',upDownPct:'上/下坡 %',
+    result:'結果',aim:'目標',aimHint:'設定距離並讀取坡度',pace:'力度',
+    aimRight:'向右瞄準 →',aimLeft:'← 向左瞄準',straight:'直線',
+    leftOfPin:'旗桿左側',rightOfPin:'旗桿右側',
+    uphill:'⬆ 上坡',downhill:'⬇ 下坡',flatDir:'— 平坦',
+    manualHide:'✕ 隱藏手動',calStable:'收集數據中…',
+    calUnstable:'⚠ 保持手機靜止…',saved:'儲存於'},
+  ja:{appTitle:'⛳ パット',greenReader:'グリーン読み',
+    permissionDesc:'スマホのモーションセンサーでグリーンの傾斜を測定します。<br/><br/>プロンプトが表示されたらアクセスを許可してください。',
+    enableSensors:'モーションセンサーを有効にする',rotateTitle:'横向きに回転',
+    rotateDesc:'電話を横向きにして、底部（ホームボタン）を右側にしてください。',
+    calTitle:'グリーン読み · キャリブレーション',calHeading:'📐 センサーキャリブレーション',
+    calDesc:'スマホを平らな台の上に置き、キャリブレーションを押してください。',
+    calSaved:'✓ キャリブレーション保存済み',calBtn:'📐 キャリブレーション',calSkip:'スキップ →',
+    calActiveDesc:'スマホを平らに静止させたままにしてください',
+    calWaiting:'安定した読み取りを待っています…',cancel:'キャンセル',
+    length:'距離（歩）',stimp:'Stimp',readSlope:'傾斜を読む',lock:'ロック ✓',
+    avg:'平均 ⌀',newReading:'新しい読み取り',reset:'リセット',manual:'✏ 手動',
+    readyHint:'<b style="color:#f1f5f9;">傾斜を読む</b> を押してください',
+    liveLabel:'ライブ · 静止してください',sideSlope:'横傾斜',upDown:'上り/下り',
+    lockedLabel:'読み取りロック済み',side:'横',prev:'前回',tilt:'傾き',
+    manualOverride:'⚠ 手動入力',breakDir:'曲がり方向',
+    rToL:'← 右から左',lToR:'左から右 →',upDownhill:'上り/下り',
+    up:'⬆ 上り',flat:'— フラット',down:'⬇ 下り',upDownPct:'上/下り %',
+    result:'結果',aim:'エイム',aimHint:'距離を設定して傾斜を読んでください',pace:'ペース',
+    aimRight:'右を狙う →',aimLeft:'← 左を狙う',straight:'ストレート',
+    leftOfPin:'ピンの左',rightOfPin:'ピンの右',
+    uphill:'⬆ 上り',downhill:'⬇ 下り',flatDir:'— フラット',
+    manualHide:'✕ 手動を隠す',calStable:'データ収集中…',
+    calUnstable:'⚠ スマホを静止させてください…',saved:'保存日'},
+  ko:{appTitle:'⛳ 퍼팅',greenReader:'그린 리더',
+    permissionDesc:'스마트폰의 모션 센서로 그린 경사를 측정합니다.<br/><br/>메시지가 표시되면 모션 접근을 허용하세요.',
+    enableSensors:'모션 센서 활성화',rotateTitle:'가로 방향으로 회전',
+    rotateDesc:'스마트폰을 가로로 돌려 하단(홈 버튼)이 오른쪽에 오도록 하세요.',
+    calTitle:'그린 리더 · 보정',calHeading:'📐 센서 보정',
+    calDesc:'스마트폰을 평평한 테이블에 놓고 보정을 누르세요.',
+    calSaved:'✓ 보정 저장됨',calBtn:'📐 보정',calSkip:'건너뛰기 →',
+    calActiveDesc:'스마트폰을 테이블 위에 평평하고 정지된 상태로 유지하세요',
+    calWaiting:'안정된 측정값 대기 중…',cancel:'취소',
+    length:'거리（걸음）',stimp:'Stimp',readSlope:'경사 읽기',lock:'잠금 ✓',
+    avg:'평균 ⌀',newReading:'새 측정',reset:'초기화',manual:'✏ 수동',
+    readyHint:'<b style="color:#f1f5f9;">경사 읽기</b> 를 누르세요',
+    liveLabel:'라이브 · 정지 상태 유지',sideSlope:'옆 경사',upDown:'오르막/내리막',
+    lockedLabel:'측정값 잠금됨',side:'옆면',prev:'이전',tilt:'기울기',
+    manualOverride:'⚠ 수동 입력',breakDir:'휘는 방향',
+    rToL:'← 우→좌',lToR:'좌→우 →',upDownhill:'오르막/내리막',
+    up:'⬆ 오르막',flat:'— 평탄',down:'⬇ 내리막',upDownPct:'오르막/내리막 %',
+    result:'결과',aim:'조준',aimHint:'거리를 설정하고 경사를 읽으세요',pace:'페이스',
+    aimRight:'오른쪽 조준 →',aimLeft:'← 왼쪽 조준',straight:'직선',
+    leftOfPin:'핀 왼쪽',rightOfPin:'핀 오른쪽',
+    uphill:'⬆ 오르막',downhill:'⬇ 내리막',flatDir:'— 평탄',
+    manualHide:'✕ 수동 숨기기',calStable:'데이터 수집 중…',
+    calUnstable:'⚠ 스마트폰을 정지시키세요…',saved:'저장됨'}
+};
+
+var AL = {
+  en:{logoSub:'Short Game',tag:'ON THE BAG',
+    distLbl:'Distance to green',lieLbl:'Lie',slopeLbl:'Slope & stance',obsLbl:'Obstacles',cta:'Get Advice',
+    fw:'Fairway / Fringe',rl:'Light Rough',rdp:'Deep Rough',sa:'Sand / Bunker',wa:'Shallow Water',hp:'Hardpan / Bare',
+    ldlR:'↳ Rough type',ldlS:'↳ Sand lie',ldlW:'↳ Water depth',
+    wg:'With Grain',ag:'Against Grain',vt:'Vertical / Matted',
+    scl:'Clean / Sitting up',st:'⅓ Buried',sf:'Fried Egg',sbur:'Fully Buried',sp:'Deep Plug',sc2:'Near Edge (chip out)',
+    wt:'⅓ Submerged',w2:'⅔ Submerged',wf:'Fully Under (<2")',
+    fl:'Flat',uh:'Uphill',dh:'Downhill',ba:'Ball Above Feet',bb:'Ball Below Feet',
+    on:'None',haz:'Hazard',tr:'Tree / Low Ceiling',
+    lShot:'Recommended Shot',lClub:'Club',lHow:'How To Play It',
+    lSlp:'⛰ Slope Adjustment',lWarn:'⚠ Heads Up',
+    edit:'← Edit',newShot:'↺ New Shot'},
+  zh:{logoSub:'短打',tag:'球場助手',
+    distLbl:'到果嶺的距離',lieLbl:'球位',slopeLbl:'坡度與站姿',obsLbl:'障礙物',cta:'獲取建議',
+    fw:'球道 / 邊緣',rl:'淺長草',rdp:'深長草',sa:'沙坑',wa:'淺水區',hp:'硬地 / 裸地',
+    ldlR:'↳ 草的種類',ldlS:'↳ 沙坑球位',ldlW:'↳ 水深',
+    wg:'順紋',ag:'逆紋',vt:'直立 / 壓平',
+    scl:'乾淨 / 浮球',st:'埋入1/3',sf:'荷包蛋',sbur:'完全埋入',sp:'深埋',sc2:'靠近邊緣（切出）',
+    wt:'浸入1/3',w2:'浸入2/3',wf:'完全浸入（<2英吋）',
+    fl:'平坦',uh:'上坡',dh:'下坡',ba:'球高於雙腳',bb:'球低於雙腳',
+    on:'無',haz:'障礙',tr:'樹木 / 低頂',
+    lShot:'推薦擊球',lClub:'球桿',lHow:'如何擊球',
+    lSlp:'⛰ 坡度調整',lWarn:'⚠ 注意事項',
+    edit:'← 編輯',newShot:'↺ 新一桿'},
+  ja:{logoSub:'ショートゲーム',tag:'ON THE BAG',
+    distLbl:'グリーンまでの距離',lieLbl:'ライ',slopeLbl:'傾斜とスタンス',obsLbl:'障害物',cta:'アドバイスを取得',
+    fw:'フェアウェイ / フリンジ',rl:'ライトラフ',rdp:'ディープラフ',sa:'バンカー',wa:'浅い水中',hp:'ハードパン / 裸地',
+    ldlR:'↳ ラフの種類',ldlS:'↳ バンカーのライ',ldlW:'↳ 水深',
+    wg:'順目',ag:'逆目',vt:'縦目 / 寝た芝',
+    scl:'クリーン',st:'1/3埋まり',sf:'目玉ライ',sbur:'完全埋まり',sp:'ディーププラグ',sc2:'エッジ近く（チップ）',
+    wt:'1/3水没',w2:'2/3水没',wf:'完全水没（2インチ未満）',
+    fl:'フラット',uh:'上り傾斜',dh:'下り傾斜',ba:'足より高いボール',bb:'足より低いボール',
+    on:'なし',haz:'ハザード',tr:'木 / 低い障害物',
+    lShot:'推奨ショット',lClub:'クラブ',lHow:'打ち方',
+    lSlp:'⛰ 傾斜調整',lWarn:'⚠ 注意事項',
+    edit:'← 編集',newShot:'↺ 新しいショット'},
+  ko:{logoSub:'숏게임',tag:'ON THE BAG',
+    distLbl:'그린까지의 거리',lieLbl:'라이',slopeLbl:'경사와 스탠스',obsLbl:'장애물',cta:'어드바이스 받기',
+    fw:'페어웨이 / 프린지',rl:'라이트 러프',rdp:'딥 러프',sa:'벙커',wa:'얕은 물속',hp:'하드팬 / 맨땅',
+    ldlR:'↳ 러프 종류',ldlS:'↳ 벙커 라이',ldlW:'↳ 수심',
+    wg:'결 방향',ag:'역결 방향',vt:'수직 / 눌린 잔디',
+    scl:'클린 / 볼 위에 놓임',st:'1/3 묻힘',sf:'프라이드에그',sbur:'완전히 묻힘',sp:'딥 플러그',sc2:'엣지 근처 (칩샷)',
+    wt:'1/3 잠김',w2:'2/3 잠김',wf:'완전 잠김 (2인치 미만)',
+    fl:'평지',uh:'오르막',dh:'내리막',ba:'볼이 발보다 높음',bb:'볼이 발보다 낮음',
+    on:'없음',haz:'해저드',tr:'나무 / 낮은 장애물',
+    lShot:'추천 샷',lClub:'클럽',lHow:'치는 방법',
+    lSlp:'⛰ 경사 조정',lWarn:'⚠ 주의사항',
+    edit:'← 편집',newShot:'↺ 새 샷'}
+};
+
+function PT(k){return (PL[lang]&&PL[lang][k])||PL.en[k]||k}
+function AT(k){return (AL[lang]&&AL[lang][k])||AL.en[k]||k}
+function MT(k){return (ML[lang]&&ML[lang][k])||ML.en[k]||k}
+
+function setLang(l) {
+  lang = l;
+  try{localStorage.setItem('accadie_lang',l)}catch(e){}
+  // Flags
+  ['en','zh','ja','ko'].forEach(function(x){
+    ['ml','pp','pr','pc','pa','al'].forEach(function(p){
+      var el=document.getElementById(p+'-'+x);
+      if(el) el.classList.toggle('active',x===l);
+    });
+  });
+  applyMenuLang();
+  applyPuttingLang();
+  applyAcaddieLang();
+}
+
+function applyMenuLang() {
+  var m=ML[lang]||ML.en;
+  var s=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v};
+  s('m-sub',m.sub); s('m-tools',m.tools); s('m-guides',m.guides);
+  s('m-sg-t',m.sgT); s('m-sg-d',m.sgD);
+  s('m-put-t',m.putT); s('m-put-d',m.putD);
+  s('m-isg-t',m.isgT); s('m-isg-d',m.isgD);
+  s('m-ip-t',m.ipT); s('m-ip-d',m.ipD);
+}
+
+function applyPuttingLang() {
+  document.querySelectorAll('[data-pi]').forEach(function(el){
+    var k=el.getAttribute('data-pi');
+    var v=PT(k); if(v) el.innerHTML=v;
+  });
+  pApplyDynamic();
+}
+
+function applyAcaddieLang() {
+  var a=AL[lang]||AL.en;
+  var s=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v};
+  s('a-logo-s',a.logoSub);
+  s('a-ld-lbl',a.distLbl); s('a-lie-lbl',a.lieLbl);
+  s('a-slp-lbl',a.slopeLbl); s('a-obs-lbl',a.obsLbl);
+  s('a-cta-lbl',a.cta);
+  // Add dots back
+  var addDot=function(id,dotId,filled){
+    var e=document.getElementById(id);
+    if(e){
+      var d=document.createElement('span');
+      d.className='a-rd'+(filled?' filled':'');d.id=dotId;
+      e.textContent=e.textContent.split('\u00A0')[0];
+      e.appendChild(document.createTextNode('\u00A0'));e.appendChild(d);
+    }
+  };
+  // Lie chips
+  s('ac-fw',a.fw);s('ac-rl',a.rl);s('ac-rdp',a.rdp);s('ac-sa',a.sa);s('ac-wa',a.wa);s('ac-hp',a.hp);
+  s('a-ldl-r',a.ldlR);s('a-ldl-s',a.ldlS);s('a-ldl-w',a.ldlW);
+  s('ac-wg',a.wg);s('ac-ag',a.ag);s('ac-vt',a.vt);
+  s('ac-scl',a.scl);s('ac-st',a.st);s('ac-sf',a.sf);s('ac-sb',a.sbur);s('ac-sp',a.sp);s('ac-sc2',a.sc2);
+  s('ac-wt',a.wt);s('ac-w2',a.w2);s('ac-wf',a.wf);
+  s('ac-fl',a.fl);s('ac-uh',a.uh);s('ac-dh',a.dh);s('ac-ba',a.ba);s('ac-bb',a.bb);
+  s('ac-on',a.on);s('ac-haz',a.haz);s('ac-tr',a.tr);
+  s('a-lbl-shot',a.lShot);s('a-lbl-club',a.lClub);s('a-lbl-how',a.lHow);
+  s('a-lbl-slp',a.lSlp);s('a-lbl-warn',a.lWarn);
+  s('a-btn-edit',a.edit);s('a-btn-new',a.newShot);
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODULE NAVIGATION
+// ═══════════════════════════════════════════════════════
+var activeModule = 'menu';
+
+function launch(mod) {
+  document.querySelectorAll('.module').forEach(function(m){m.classList.remove('active')});
+  document.getElementById('module-'+mod).classList.add('active');
+  activeModule = mod;
+  var ps=document.getElementById('p-sw'), as=document.getElementById('a-sw');
+  if(ps) ps.style.display = mod==='putting' ? 'flex' : 'none';
+  if(as) as.style.display = mod==='shortgame' ? 'flex' : 'none';
+  if(mod==='putting') pUpdateOri();
+}
+
+function goMenu() { launch('menu'); }
+
+// ═══════════════════════════════════════════════════════
+//  INSTRUCTIONS — loaded from .md files via fetch
+// ═══════════════════════════════════════════════════════
+var INSTR_FILES = {
+  shortgame: {
+    en:  'acaddie-instructions.md',
+    zh:  'acaddie-instructions-zh-TW.md',
+    ja:  'acaddie-instructions-ja.md',
+    ko:  'acaddie-instructions-ko.md'
+  },
+  putting: {
+    en:  'putting-user-guide-en.md',
+    zh:  'putting-user-guide-zh.md',
+    ja:  'putting-user-guide-ja.md',
+    ko:  'putting-user-guide-ko.md'
+  }
+};
+// (old embedded strings removed — content loaded from .md files)
+
+function openInstr(type) {
+  var m = ML[lang] || ML.en;
+  document.getElementById('instr-title').textContent = type === 'shortgame' ? m.isgH : m.ipH;
+  var body = document.getElementById('instr-body');
+  body.innerHTML = '<div style="color:#8a9e8c;padding:40px;text-align:center">Loading&#8230;</div>';
+  document.getElementById('instr-overlay').classList.add('vis');
+  var file = (INSTR_FILES[type] && INSTR_FILES[type][lang]) || INSTR_FILES[type].en;
+  fetch(file)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function(md) {
+      body.innerHTML = marked.parse(md);
+      body.scrollTop = 0;
+    })
+    .catch(function(err) {
+      body.innerHTML = '<div style="color:#f87171;padding:20px">Could not load instructions.<br/><small>' + err.message + '</small></div>';
+    });
+}
+function closeInstr() {
+  document.getElementById('instr-overlay').classList.remove('vis');
+}
+
+// ═══════════════════════════════════════════════════════
+//  PUTTING — ALL LOGIC
+// ═══════════════════════════════════════════════════════
+var pPerm=false, pCalDone=false;
+var pS={stimp:10.0,len:3.0,sensorOn:false,curSide:0,curSideDir:'R',curUD:0,curUDDir:'flat',
+  locked:null,prev:null,manMode:false,manSide:1.0,manSideDir:'R',manUD:1.0,manUDDir:'flat',
+  isReading:false,sideOff:0,udOff:0};
+
+function pShowSc(w) {
+  document.getElementById('p-perm').classList.toggle('hidden', w!=='permission');
+  document.getElementById('p-rot').classList.toggle('hidden', w!=='rotate');
+  document.getElementById('p-calsc').classList.toggle('hidden', w!=='calibration');
+  var ar=document.getElementById('p-ar');
+  w==='app' ? ar.classList.add('vis') : ar.classList.remove('vis');
+  var sw=document.getElementById('p-sw');
+  if(sw) sw.style.display = w==='app' ? 'flex' : 'none';
+}
+
+function pIsLS() { return window.innerWidth > window.innerHeight; }
+
+function pUpdateOri() {
+  if(activeModule!=='putting') return;
+  if(!pPerm){pShowSc('permission');return}
+  if(!pIsLS()){pCancelCal();pShowSc('rotate');return}
+  pCalDone ? pShowSc('app') : pShowSc('calibration');
+}
+
+window.addEventListener('resize',function(){if(activeModule==='putting')pUpdateOri()});
+window.addEventListener('orientationchange',function(){setTimeout(function(){if(activeModule==='putting')pUpdateOri()},150)});
+
+async function pReqPerm() {
+  var btn=document.querySelector('#p-perm .p-smb.blue');
+  btn.textContent='Waiting…'; btn.disabled=true;
+  if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function') {
+    try {
+      var r=await DeviceOrientationEvent.requestPermission();
+      if(r==='granted'){pPerm=true;pStartSensor();pInitCal();pUpdateOri();}
+      else{btn.textContent=PT('enableSensors');btn.disabled=false;alert('Motion access denied.\n\nGo to Settings → Safari → Motion & Orientation Access → ON, then reload.');}
+    }catch(e){btn.textContent=PT('enableSensors');btn.disabled=false;alert('Error: '+e.message)}
+  } else if(typeof DeviceOrientationEvent!=='undefined'){
+    pPerm=true;pStartSensor();pInitCal();pUpdateOri();
+  } else {
+    alert('Motion sensors not supported. Using manual entry.');
+    pPerm=true;pCalDone=true;pUpdateOri();
+  }
+}
+
+var pCalTmr=null,pCalSamps=[],pCalSecs=8,pCalRunning=false,pCalBuf=[];
+var P_STAB=0.15, P_NSAMP=5;
+
+function pInitCal() {
+  var saved=null;
+  try{saved=JSON.parse(localStorage.getItem('putting_cal_offset'))}catch(e){}
+  var skip=document.getElementById('p-skip'), badge=document.getElementById('p-csb-el');
+  if(saved && typeof saved.sideOffset==='number'){
+    pS.sideOff=saved.sideOffset; pS.udOff=saved.udOffset;
+    document.getElementById('p-csb-s').textContent=saved.sideOffset.toFixed(2)+'°';
+    document.getElementById('p-csb-u').textContent=saved.udOffset.toFixed(2)+'°';
+    document.getElementById('p-csb-ts').textContent=PT('saved')+': '+(saved.timestamp?new Date(saved.timestamp).toLocaleDateString():'—');
+    badge.classList.remove('hidden'); skip.style.visibility='visible'; skip.disabled=false;
+  } else {
+    badge.classList.add('hidden'); skip.style.visibility='hidden'; skip.disabled=true;
+  }
+  document.getElementById('p-cal-idle').classList.remove('hidden');
+  document.getElementById('p-cal-act').classList.add('hidden');
+}
+
+function pStartCal() {
+  pCalSamps=[];pCalBuf=[];pCalSecs=8;pCalRunning=false;
+  document.getElementById('p-cal-idle').classList.add('hidden');
+  document.getElementById('p-cal-act').classList.remove('hidden');
+  document.getElementById('p-cal-cd').textContent='8';
+  document.getElementById('p-cal-cd').style.color='#3b82f6';
+  pSetCalSt(PT('calWaiting'),false);
+  window.addEventListener('deviceorientation',pOnCalOri);
+}
+
+function pOnCalOri(e) {
+  var b=e.beta||0, g=e.gamma||0;
+  pCalBuf.push({b:b,g:g});
+  if(pCalBuf.length>P_NSAMP) pCalBuf.shift();
+  if(pCalBuf.length<P_NSAMP) return;
+  var bv=pCalBuf.map(function(x){return x.b}), gv=pCalBuf.map(function(x){return x.g});
+  var br=Math.max.apply(null,bv)-Math.min.apply(null,bv), gr=Math.max.apply(null,gv)-Math.min.apply(null,gv);
+  var stable=br<P_STAB && gr<P_STAB;
+  if(!stable){
+    if(pCalRunning){pCalRunning=false;clearInterval(pCalTmr);pCalTmr=null;pCalSamps=[];pCalSecs=8;document.getElementById('p-cal-cd').textContent='8';document.getElementById('p-cal-cd').style.color='#3b82f6';}
+    pSetCalSt(PT('calUnstable'),true);return;
+  }
+  if(!pCalRunning){
+    pCalRunning=true;pSetCalSt(PT('calStable'),false);
+    pCalTmr=setInterval(function(){
+      pCalSecs--;document.getElementById('p-cal-cd').textContent=pCalSecs;
+      if(pCalSecs<=0){clearInterval(pCalTmr);pCalTmr=null;window.removeEventListener('deviceorientation',pOnCalOri);pApplyCal();}
+    },1000);
+  }
+  pCalSamps.push({b:b,g:g});
+}
+
+function pSetCalSt(msg,warn){var el=document.getElementById('p-cal-st');el.textContent=msg;warn?el.classList.add('warn'):el.classList.remove('warn');}
+
+function pApplyCal(){
+  if(!pCalSamps.length){pCancelCal();return}
+  var ab=pCalSamps.reduce(function(s,x){return s+x.b},0)/pCalSamps.length;
+  var ag=pCalSamps.reduce(function(s,x){return s+x.g},0)/pCalSamps.length;
+  pS.sideOff=parseFloat(ab.toFixed(3)); pS.udOff=parseFloat(ag.toFixed(3));
+  try{localStorage.setItem('putting_cal_offset',JSON.stringify({sideOffset:pS.sideOff,udOffset:pS.udOff,timestamp:new Date().toISOString()}))}catch(e){}
+  pFinishCal();
+}
+
+function pCancelCal(){
+  if(pCalTmr){clearInterval(pCalTmr);pCalTmr=null}
+  window.removeEventListener('deviceorientation',pOnCalOri);
+  pCalRunning=false;pCalSamps=[];
+  var cs=document.getElementById('p-calsc');
+  if(cs&&!cs.classList.contains('hidden')){
+    document.getElementById('p-cal-idle').classList.remove('hidden');
+    document.getElementById('p-cal-act').classList.add('hidden');
+  }
+}
+
+function pFinishCal(){pCancelCal();pCalDone=true;pUpdateOri();}
+
+function pStartSensor(){pS.sensorOn=true;window.addEventListener('deviceorientation',pOnOri);}
+
+function pOnOri(e){
+  if(!pS.isReading) return;
+  var b=(e.beta||0)-pS.sideOff, g=(e.gamma||0)-pS.udOff;
+  var angle=0;
+  if(window.screen&&window.screen.orientation) angle=window.screen.orientation.angle||0;
+  else if(typeof window.orientation!=='undefined') angle=window.orientation;
+  var side,sdir,ud,udir;
+  if(angle===90||angle===-270){
+    side=Math.abs(b);sdir=b<=0?'R':'L';ud=Math.abs(g);udir=Math.abs(g)<0.4?'flat':(g<=0?'uphill':'downhill');
+  } else if(angle===-90||angle===270){
+    side=Math.abs(b);sdir=b>=0?'L':'R';ud=Math.abs(g);udir=Math.abs(g)<0.4?'flat':(g>=0?'uphill':'downhill');
+  } else {
+    side=Math.abs(g);sdir=g>=0?'R':'L';ud=Math.abs(b);udir=Math.abs(g)<0.4?'flat':(g>0?'uphill':'downhill');
+  }
+  side=Math.tan(side*Math.PI/180)*100; ud=Math.tan(ud*Math.PI/180)*100;
+  pS.curSide=parseFloat(side.toFixed(1));pS.curSideDir=sdir;pS.curUD=parseFloat(ud.toFixed(1));pS.curUDDir=udir;
+  document.getElementById('p-ls').textContent=pS.curSide.toFixed(1)+'%';
+  document.getElementById('p-lsd').textContent=sdir==='R'?PT('aimRight'):PT('aimLeft');
+  document.getElementById('p-lu').textContent=pS.curUD.toFixed(1)+'%';
+  document.getElementById('p-lud').textContent=udir==='flat'?PT('flatDir'):udir==='uphill'?PT('uphill'):PT('downhill');
+}
+
+function pApplyDynamic(){
+  var lsd=document.getElementById('p-lsd'); if(lsd&&lsd.textContent!=='—') lsd.textContent=pS.curSideDir==='R'?PT('aimRight'):PT('aimLeft');
+  var lud=document.getElementById('p-lud'); if(lud&&lud.textContent!=='—') lud.textContent=pS.curUDDir==='flat'?PT('flatDir'):pS.curUDDir==='uphill'?PT('uphill'):PT('downhill');
+  var mb=document.getElementById('p-manual'); if(mb) mb.textContent=pS.manMode?PT('manualHide'):PT('manual');
+  pRecalc();
+}
+
+function pStartRead(){pS.isReading=true;pShowCS('reading');pB('p-read',false);pB('p-lock',true);pB('p-new',false);pB('p-reset',false);pB('p-avg',false);}
+function pLock(){
+  pS.isReading=false;
+  if(pS.locked) pS.prev=Object.assign({},pS.locked);
+  pS.locked={side:pS.curSide,sdir:pS.curSideDir,ud:pS.curUD,udir:pS.curUDDir};
+  pUpdLocked();pShowCS('locked');pB('p-read',false);pB('p-lock',false);pB('p-new',true);pB('p-reset',true);pB('p-avg',!!pS.prev);pRecalc();
+}
+function pAvg(){
+  if(!pS.locked||!pS.prev) return;
+  pS.locked={side:parseFloat(((pS.locked.side+pS.prev.side)/2).toFixed(1)),sdir:pS.locked.sdir,ud:parseFloat(((pS.locked.ud+pS.prev.ud)/2).toFixed(1)),udir:pS.locked.udir};
+  pS.prev=null;pUpdLocked();pB('p-avg',false);pRecalc();
+}
+function pReset(){pS.locked=null;pS.prev=null;pS.isReading=false;pShowCS('ready');pB('p-read',true);pB('p-lock',false);pB('p-new',false);pB('p-reset',false);pB('p-avg',false);pClearRes();}
+function pShowCS(s){['ready','reading','locked'].forEach(function(x){document.getElementById('p-s-'+x).classList.toggle('hidden',x!==s)});}
+function pB(id,vis){var e=document.getElementById(id);if(e){vis?e.classList.remove('hidden'):e.classList.add('hidden');}}
+function pUpdLocked(){
+  var l=pS.locked;
+  document.getElementById('p-lks').textContent=l.side.toFixed(1)+'% '+(l.sdir==='R'?'→R':'←L');
+  document.getElementById('p-lku').textContent=l.ud.toFixed(1)+'% '+(l.udir==='flat'?'—':l.udir==='uphill'?'⬆':'⬇');
+  var pb=document.getElementById('p-prev');
+  if(pS.prev){
+    document.getElementById('p-psv').textContent=pS.prev.side.toFixed(1)+'%';
+    document.getElementById('p-puv').textContent=pS.prev.ud.toFixed(1)+'%'+(pS.prev.udir==='flat'?'':pS.prev.udir==='uphill'?'⬆':'⬇');
+    pb.classList.remove('hidden');
+  } else {pb.classList.add('hidden');}
+}
+function pToggleMan(){
+  pS.manMode=!pS.manMode;
+  var p=document.getElementById('p-manp'),b=document.getElementById('p-manual');
+  pS.manMode?(p.classList.add('open'),b.textContent=PT('manualHide'),b.classList.add('pur')):(p.classList.remove('open'),b.textContent=PT('manual'),b.classList.remove('pur'));
+  pRecalc();
+}
+function pAdjMS(d){pS.manSide=Math.max(0,Math.min(6,parseFloat((pS.manSide+d).toFixed(1))));document.getElementById('p-msv').textContent=pS.manSide.toFixed(1)+'%';pRecalc();}
+function pSetMSD(d){pS.manSideDir=d;document.getElementById('p-togL').classList.toggle('active',d==='L');document.getElementById('p-togR').classList.toggle('active',d==='R');pRecalc();}
+function pSetMUD(d){
+  pS.manUDDir=d;
+  [['p-togUp','uphill'],['p-togFl','flat'],['p-togDn','downhill']].forEach(function(k){document.getElementById(k[0]).classList.toggle('active',k[1]===d);});
+  document.getElementById('p-muw').style.display=d==='flat'?'none':'block';
+  pRecalc();
+}
+function pAdjMU(d){pS.manUD=Math.max(0.1,Math.min(6,parseFloat((pS.manUD+d).toFixed(1))));document.getElementById('p-muv').textContent=pS.manUD.toFixed(1)+'%';pRecalc();}
+
+function pEdit(f){
+  var eid=f==='length'?'p-len':'p-stimp';
+  var cur=f==='length'?pS.len:pS.stimp;
+  var min=f==='length'?0.5:7,max=f==='length'?50:14,step=0.5;
+  var el=document.getElementById(eid);
+  var inp=document.createElement('input');
+  inp.type='number';inp.inputMode='decimal';inp.min=min;inp.max=max;inp.step=step;inp.value=cur.toFixed(1);
+  inp.className='p-nvi'; if(f==='stimp') inp.style.fontSize='33px';
+  function commit(){
+    var v=parseFloat(inp.value);
+    if(!isNaN(v)){var c=Math.max(min,Math.min(max,Math.round(v/step)*step));
+      if(f==='length'){pS.len=parseFloat(c.toFixed(1));el.textContent=pS.len.toFixed(1);}
+      else{pS.stimp=parseFloat(c.toFixed(1));el.textContent=pS.stimp.toFixed(1);}
+    } else {el.textContent=cur.toFixed(1);}
+    inp.replaceWith(el);pRecalc();
+  }
+  inp.addEventListener('blur',commit);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')inp.blur()});
+  el.replaceWith(inp);inp.focus();inp.select();
+}
+
+function pAdjStimp(d){pS.stimp=Math.max(7,Math.min(14,parseFloat((pS.stimp+d).toFixed(1))));document.getElementById('p-stimp').textContent=pS.stimp.toFixed(1);pRecalc();}
+function pAdjLen(d){pS.len=Math.max(0.5,Math.min(50,parseFloat((pS.len+d).toFixed(1))));document.getElementById('p-len').textContent=pS.len.toFixed(1);pRecalc();}
+
+function pCalcPutt(paces,sidePct,sdir,udir,udPct,stimp){
+  var base=(paces*2)-1, aim=base*sidePct;
+  var adj=aim*0.05*udPct;
+  if(udir==='uphill') aim-=adj; if(udir==='downhill') aim+=adj;
+  aim=aim*(1+0.10*(stimp-10));
+  var pm={8:{downhill:14,uphill:22},9:{downhill:16,uphill:20},10:{downhill:18,uphill:18},11:{downhill:20,uphill:16},12:{downhill:22,uphill:14}};
+  var sl=Math.max(8,Math.min(12,Math.floor(stimp))),sh=Math.max(8,Math.min(12,Math.ceil(stimp))),fr=stimp-sl;
+  var mL=pm[sl]||pm[10],mH=pm[sh]||pm[10];
+  var mDn=mL.downhill+(mH.downhill-mL.downhill)*fr, mUp=mL.uphill+(mH.uphill-mL.uphill)*fr;
+  var pace=100;
+  if(udir==='uphill') pace=100+(mUp*udPct);
+  if(udir==='downhill') pace=100-(mDn*udPct);
+  pace=Math.max(20,Math.min(220,pace));
+  var aimStr='';
+  if(aim<0.5) aimStr='Straight';
+  else if(aim<12) aimStr=aim.toFixed(1)+'"';
+  else{var ft=Math.floor(aim/12),ins=Math.round(aim%12);aimStr=ins===0?ft+"'":ft+"' "+ins+'"';}
+  return{aim:aim,aimStr:aimStr,adir:sdir,pace:Math.round(pace)};
+}
+
+function pRecalc(){
+  var side,sdir,ud,udir;
+  if(pS.manMode){side=pS.manSide;sdir=pS.manSideDir;ud=pS.manUD;udir=pS.manUDDir;}
+  else if(pS.locked){side=pS.locked.side;sdir=pS.locked.sdir;ud=pS.locked.ud;udir=pS.locked.udir;}
+  else{pClearRes();return;}
+  var r=pCalcPutt(pS.len,side,sdir,udir,ud,pS.stimp);
+  if(r.aim<0.5){document.getElementById('p-aim-arr').textContent='↑';document.getElementById('p-aim-arr').style.color='#22c55e';}
+  else{document.getElementById('p-aim-arr').textContent=sdir==='L'?'←':'→';document.getElementById('p-aim-arr').style.color='#3b82f6';}
+  document.getElementById('p-aim-n').textContent=r.aim<0.5?'':r.aimStr;
+  document.getElementById('p-aim-s').textContent=r.aim<0.5?PT('straight'):(sdir==='L'?PT('leftOfPin'):PT('rightOfPin'));
+  var cups=r.aim<0.5?null:Math.round((r.aim/4.25)*2)/2;
+  document.getElementById('p-aim-c').textContent=cups===null?'—':cups.toFixed(1)+' cups';
+  var col=r.pace>=90&&r.pace<=115?'#22c55e':r.pace<60||r.pace>155?'#ef4444':'#f97316';
+  document.getElementById('p-pace-n').textContent=r.pace+'%'; document.getElementById('p-pace-n').style.color=col;
+  var pd=Math.round((r.pace/100*pS.len)*2)/2;
+  document.getElementById('p-pace-d').textContent='≈ '+pd.toFixed(1)+' paces'; document.getElementById('p-pace-d').style.color=col;
+  document.getElementById('p-pace-b').style.width=Math.min(100,(r.pace/160)*100)+'%';
+  document.getElementById('p-pace-b').style.background=col;
+}
+function pClearRes(){
+  document.getElementById('p-aim-arr').textContent='—';document.getElementById('p-aim-arr').style.color='#8a9e8c';
+  document.getElementById('p-aim-n').textContent='—';
+  document.getElementById('p-aim-s').textContent=PT('aimHint');
+  document.getElementById('p-aim-c').textContent='—';
+  document.getElementById('p-pace-n').textContent='—';document.getElementById('p-pace-n').style.color='#8a9e8c';
+  document.getElementById('p-pace-d').textContent='—';
+  document.getElementById('p-pace-b').style.width='0%';
+}
+
+// ═══════════════════════════════════════════════════════
+//  SHORT GAME — ALL LOGIC
+// ═══════════════════════════════════════════════════════
+var aS={distance:null,lie:null,det:null,slope:null,obstacle:'none'};
+
+function aSel(el){
+  var g=el.dataset.g;
+  document.querySelectorAll('[data-g="'+g+'"]').forEach(function(c){c.classList.remove('selected')});
+  el.classList.add('selected');
+  var v=el.dataset.v;
+  if(g==='lie'){aS.lie=v;aS.det=null;
+    document.querySelectorAll('[data-g="det"]').forEach(function(c){c.classList.remove('selected')});
+    document.getElementById('a-det-rough').classList.remove('vis');
+    document.getElementById('a-det-sand').classList.remove('vis');
+    document.getElementById('a-det-water').classList.remove('vis');
+    if(v==='rough-light'||v==='rough-deep') document.getElementById('a-det-rough').classList.add('vis');
+    else if(v==='sand') document.getElementById('a-det-sand').classList.add('vis');
+    else if(v==='water') document.getElementById('a-det-water').classList.add('vis');
+  } else if(g==='det'){aS.det=v;}
+  else if(g==='slope'){aS.slope=v;}
+  else if(g==='obs'){aS.obstacle=v;}
+  aUpdateCTA();
+}
+
+function aOnDist(){var v=parseFloat(document.getElementById('a-dist').value);aS.distance=(!isNaN(v)&&v>0)?v:null;aUpdateCTA();}
+
+function aUpdateCTA(){
+  var ok=aS.distance&&aS.lie&&aS.slope;
+  var dd=document.getElementById('a-dot-d');if(dd)dd.classList.toggle('filled',!!aS.distance);
+  var dl=document.getElementById('a-dot-l');if(dl)dl.classList.toggle('filled',!!aS.lie);
+  var ds=document.getElementById('a-dot-s');if(ds)ds.classList.toggle('filled',!!aS.slope);
+  document.getElementById('a-cta').disabled=!ok;
+}
+
+function aBuild(){
+  var d=aS.distance,lie=aS.lie,det=aS.det,slp=aS.slope,obs=aS.obstacle;
+  var shot='',club='',steps=[],slopeNote='',warning='';
+  if(lie==='sand'){
+    if(det==='sand-buried'||det==='sand-plug'){
+      if(det==='sand-plug'){shot='Deep Plug Escape';club='Sand Wedge (SW · 56°)';steps=['Square the clubface — do NOT open it.','Play ball back in your stance.','Swing hard and drive the club into the sand behind the ball.','Let the club stick in the sand — no follow-through.','Expect the ball to come out low with a lot of roll.'];warning='No follow-through. Ball will run a long way — plan for a lot of roll after landing.';}
+      else{shot='Buried Lie Blast';club='Sand Wedge (SW · 56°)';steps=['Square the clubface — opening it will cause it to bounce off the sand.','Place the ball in the center of your stance.','Aim straight at the target — no left offset.','Dig 2 inches into the sand with maximum force.','Commit fully — this shot needs power.'];warning='Ball comes out low with little spin — rolls much farther than normal. Aim short of the pin.';}
+    } else if(det==='sand-third'||det==='sand-fried'){
+      shot=det==='sand-fried'?'Fried Egg Blast':'1/3 Buried Blast';club='Sand Wedge (SW · 56°)';
+      steps=['Open the clubface halfway — not fully open.','Place ball 2 inches behind your left heel.','Aim your body and swing line about 12° left of the target.','Make a full swing and dig the club 1 inch into the sand.','Commit to a full finish — stopping kills this shot.'];
+      warning=det==='sand-fried'?'Fried egg lies come out with almost no spin. Expect more roll than a clean blast.':'';
+    } else if(det==='sand-chip'){
+      shot='Sand Chip';club=d<=15?'Sand Wedge (SW · 56°)':'Gap Wedge (GW · 52°)';
+      steps=['Square the clubface — this is a chip, not a blast.','Play ball just behind center in your stance.','Keep your head level and maintain a constant swing radius.','Make a smooth chipping motion — no digging.','Aim to land the ball 3 feet onto the green and let it roll.'];
+    } else {
+      if(d<=15){shot='Standard Sand Blast';club='Sand Wedge (SW · 56°)';steps=['Open the clubface wide — face pointing to the sky.','Place ball inside your left heel.','Aim your body and swing line 17° left of the target.','Make a 9 o\'clock backswing (firm, not a full swing).','Commit to a world-class full finish — the club never touches the ball.'];}
+      else if(d<=30){shot='Full Sand Blast';club='Sand Wedge (SW · 56°)';steps=['Open the clubface wide — face pointing to the sky.','Place ball inside your left heel.','Aim your body and swing line 17° left of the target.','Make a full backswing with a full committed finish.','The club enters the sand 2 inches behind the ball — never touch the ball directly.'];}
+      else{shot='Long Sand Blast';club='Gap Wedge (GW · 52°)';steps=['Open the clubface slightly less than a standard blast.','Place ball inside your left heel.','Aim 17° left of target with a full aggressive swing.','The lower loft of the GW gives you extra distance.','Full finish — drive all the way through.'];warning='For very long bunker shots, GW gives more distance but less height. Make sure you have enough green.';}
+    }
+  } else if(lie==='water'){
+    if(det==='water-full'){shot='Submerged Ball Blast';club='Sand Wedge (SW · 56°)';steps=['Square the clubface — do not open it.','Place ball in the center of your stance.','Aim straight at the target.','Use maximum power to move both the water and ball.','Full committed swing — hesitation costs distance.'];warning='Remove your watch and roll up your sleeve. The splash will be enormous. Only attempt if ball is less than 2 inches under.';}
+    else if(det==='water-two-thirds'){shot='Water Recovery';club='Sand Wedge (SW · 56°)';steps=['Open the clubface 45°.','Play ball slightly back in your stance.','Swing harder than a normal pitch to cut into the water.','Keep your head down — the splash will be significant.','Aim to get the ball moving forward — distance control is secondary.'];warning='High-risk shot. Consider taking a penalty drop if the lie is unfavorable.';}
+    else{shot='Water Splash Shot';club='Lob Wedge (LW · 60°)';steps=['Open the clubface fully — face pointing to the sky.','Play ball forward in your stance.','Let the club bounce and splash off the water surface.','Make a full swing — the club skips through the water like a sand blast.','High follow-through to keep ball trajectory up.'];warning='Only works when ball is sitting high in water. Club bounces off the surface — do not dig.';}
+  } else if(lie==='rough-deep'){
+    if(det==='vertical'){shot='Power Dig';club='Sand Wedge (SW · 56°)';steps=['Open the clubface wide.','Ball slightly forward of center.','Make a steep downswing — dig under the ball aggressively.','Use maximum power — the grass will kill your clubhead speed.','Expect the ball to pop out higher than normal with little roll.'];warning='Deep rough with matted grass is extremely difficult. Ball may not travel far — plan to leave a short pitch.';}
+    else if(det==='against-grain'){shot='Against-Grain Dig';club=d<=20?'Sand Wedge (SW · 56°)':'Gap Wedge (GW · 52°)';steps=['Take one club more than usual — against-grain rough kills distance.','Open the clubface slightly.','Make a steep, descending blow to cut through the grass.','Keep the grip pressure firm — the grass will try to close the face.','Expect less distance than normal and plan accordingly.'];}
+    else{shot=d<=20?'Lob Out':'Power Pitch';club=d<=20?'Lob Wedge (LW · 60°)':'Sand Wedge (SW · 56°)';
+      steps=d<=20?['Open the clubface wide.','Play ball forward in stance.','Make a steep full swing — cut the grass aggressively.','High follow-through.','Ball will fly high and stop quickly.']:['Open the clubface slightly.','Athletic stance, ball centered.','Full swing with steep attack angle.','Drive through the grass — do not slow down.','Expect less distance than normal.'];}
+  } else if(lie==='rough-light'){
+    if(det==='against-grain'){shot='Controlled Pitch';club=d<=20?'Sand Wedge (SW · 56°)':'Gap Wedge (GW · 52°)';steps=['Take one extra club — against-grain reduces distance.','Keep a firm grip to prevent the grass twisting the face.','Make a smooth swing — do not fight the grass.','Land ball on the green and let it run.','Full follow-through — stay committed.'];}
+    else{shot=d<=20?'Standard Chip':'Standard Pitch';club=d<=20?'Pitching Wedge (PW · 46°)':'Sand Wedge (SW · 56°)';
+      steps=d<=20?['Narrow stance, ball off back ankle.','Hands forward — shaft leans toward target.','No wrist cock — pure triangle motion.','Land ball just onto the green and let it run.','Follow-through 20% longer than backswing.']:['Athletic stance, ball centered, lead foot flared 30–45°.','Short-to-long swing — follow-through 50% longer than backswing.','Finish high but abbreviated — not a full swing finish.'];}
+  } else if(lie==='hardpan'){
+    shot='Pinch Shot';club=d<=20?'Pitching Wedge (PW · 46°)':'Gap Wedge (GW · 52°)';
+    steps=['Play ball slightly back in your stance.','Hands well forward — shaft lean is critical.','Make a descending blow — hit ball first, then ground.','Keep wrists firm through impact.','Expect the ball to come out lower with more roll than a soft lie.'];
+    warning='Avoid using a SW or LW from hardpan — the bounce will cause a thin shot. PW or GW only.';
+  } else {
+    if(obs==='tree'){shot='Bump and Run';club='5-iron (~27°) or 6-iron (~30°)';steps=['Play ball in the center of your stance.','Stand tall and close to the ball.','Low sweeping motion — not a descending blow.','Partial wrist cock for power on longer shots.','Ball will run low and roll to the pin.'];warning='Avoid landing on any bumps or humps — find a smooth entry point on the green.';}
+    else if(obs==='carry'){
+      if(d<=20){shot='Cut Lob';club='Lob Wedge (LW · 60°)';steps=['Open the clubface 45° before taking your grip.','Aim your swing line to the left of the target.','Ball centered relative to your swing line.','Make an aggressive swing — 9 o\'clock backswing for a 15-yard carry.','Keep hands and arms soft — let the loft do the work.'];warning='High-risk shot. If not practiced, consider a safer angle of attack.';}
+      else{shot='Standard Pitch';club=d<=30?'Sand Wedge (SW · 56°)':'Gap Wedge (GW · 52°)';steps=['Athletic stance, ball centered, lead foot flared 30–45°.','Short-to-long swing — follow-through 50% longer than backswing.','Finish high to maximize height and carry the hazard.','Land ball just past the hazard on the green.'];}
+    } else if(d<=5){shot='Chiputt';club='Putter or 7-iron (~35°)';steps=['Use your putter if the path is clear and fringe is short.','For longer fringe, use a 7-iron with a chipping motion.','Chipping stance — narrow, ball slightly ahead of center.','Pendulum stroke — same as putting.','Get the ball rolling immediately.'];}
+    else if(d<=12){shot='Chip and Run';club='7-iron (~35°) to Pitching Wedge (PW · 46°)';steps=['Lower loft = more roll = easier to judge distance.','Very narrow stance — feet 4–6 inches apart.','Ball off your back ankle, hands forward.','Triangle motion — no wrist break.','Follow-through 20% longer than backswing.'];}
+    else if(d<=25){shot='Standard Chip';club='Pitching Wedge (PW · 46°) or Gap Wedge (GW · 52°)';steps=['Narrow stance, ball off back ankle.','Hands forward — shaft leans toward target.','No wrist cock — pure triangle motion.','Land ball just onto the green and let it run.','Follow-through 20% longer than backswing.'];}
+    else if(d<=40){shot='Standard Pitch';club='Sand Wedge (SW · 56°)';steps=['Athletic stance — feet 10–15 inches apart.','Ball exactly centered in your stance.','Lead foot flared 30–45° toward target.','Short-to-long swing — follow-through 50% longer than backswing.','Finish high but abbreviated — never a full swing finish.'];}
+    else{shot='Long Pitch';club='Gap Wedge (GW · 52°) or Pitching Wedge (PW · 46°)';steps=['Athletic stance, ball centered, lead foot flared.','Bigger backswing for distance — but still short-to-long.','Follow-through 50% longer than backswing.','Keep body rotation smooth — dead hands, let the body turn do the work.','Aim to land ball 5–8 feet short of pin and let it release.'];}
+  }
+  if(slp==='downhill') slopeNote='Set your shoulders parallel to the slope — lean into the hill. Ball will come out lower and run more than normal. Use more loft than you think you need.';
+  else if(slp==='uphill') slopeNote='Set your shoulders parallel to the slope. Use one extra club (less loft) for every 5° of uphill angle. Ball will fly higher and stop quicker.';
+  else if(slp==='ball-above') slopeNote='Aim right of your target — the slope will pull the ball left. Use a firm grip to prevent the club twisting at impact.';
+  else if(slp==='ball-below') slopeNote='Stand close to the ball and stay down throughout the swing. Aim further left than feels natural.';
+  return{shot:shot,club:club,steps:steps,slopeNote:slopeNote,warning:warning};
+}
+
+function aRender(adv){
+  var lieL={fairway:'Fairway/Fringe','rough-light':'Light Rough','rough-deep':'Deep Rough',sand:'Sand',water:'Water',hardpan:'Hardpan'};
+  var slpL={flat:'Flat',uphill:'Uphill',downhill:'Downhill','ball-above':'Ball Above Feet','ball-below':'Ball Below Feet'};
+  document.getElementById('a-sitbar').textContent=aS.distance+' yds  ·  '+(lieL[aS.lie]||aS.lie)+'  ·  '+(slpL[aS.slope]||aS.slope)+(aS.obstacle!=='none'?'  ·  '+(aS.obstacle==='carry'?'Hazard':'Tree'):'');
+  document.getElementById('a-shot-n').textContent=adv.shot;
+  document.getElementById('a-club').textContent=adv.club;
+  var ie=document.getElementById('a-instrs');ie.innerHTML='';
+  adv.steps.forEach(function(s,i){
+    var row=document.createElement('div');row.style.cssText='display:flex;gap:10px;margin-bottom:10px;align-items:flex-start';
+    var num=document.createElement('div');num.style.cssText='min-width:22px;height:22px;background:transparent;border:1px solid rgba(201,168,76,0.45);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#c9a84c;flex-shrink:0;margin-top:1px';num.textContent=i+1;
+    var txt=document.createElement('div');txt.style.cssText='font-size:14px;color:#e8f0ea;line-height:1.55';txt.textContent=s;
+    row.appendChild(num);row.appendChild(txt);ie.appendChild(row);
+  });
+  var sc=document.getElementById('a-slope-card');
+  if(adv.slopeNote){document.getElementById('a-slope-txt').textContent=adv.slopeNote;sc.style.display='block';}else{sc.style.display='none';}
+  var wc=document.getElementById('a-warn-card');
+  if(adv.warning){document.getElementById('a-warn-txt').textContent=adv.warning;wc.style.display='block';}else{wc.style.display='none';}
+}
+
+function aGetAdvice(){aRender(aBuild());document.getElementById('a-in').classList.add('hidden');document.getElementById('a-out').classList.remove('hidden');document.getElementById('module-shortgame').scrollTop=0;}
+function aGoBack(){document.getElementById('a-out').classList.add('hidden');document.getElementById('a-in').classList.remove('hidden');document.getElementById('module-shortgame').scrollTop=0;}
+function aReset(){
+  aS={distance:null,lie:null,det:null,slope:null,obstacle:'none'};
+  document.getElementById('a-dist').value='';
+  document.querySelectorAll('[data-g="lie"],[data-g="det"],[data-g="slope"],[data-g="obs"]').forEach(function(c){c.classList.remove('selected')});
+  document.querySelector('[data-g="obs"][data-v="none"]').classList.add('selected');
+  ['a-det-rough','a-det-sand','a-det-water'].forEach(function(id){document.getElementById(id).classList.remove('vis')});
+  document.getElementById('a-out').classList.add('hidden');
+  document.getElementById('a-in').classList.remove('hidden');
+  aUpdateCTA();
+  document.getElementById('module-shortgame').scrollTop=0;
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+document.getElementById('p-sw').style.display='none';
+document.getElementById('a-sw').style.display='none';
+pB('p-read',true);pB('p-lock',false);pB('p-new',false);pB('p-reset',false);pB('p-avg',false);
+pRecalc();
+aUpdateCTA();
+
+(function(){
+  var s=null;
+  try{s=localStorage.getItem('accadie_lang')}catch(e){}
+  setLang((s&&PL[s])?s:'en');
+})();
+</script>
+</body>
+</html>
