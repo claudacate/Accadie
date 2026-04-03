@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Putting Calculator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: #020817;
+      font-family: 'Courier New', monospace;
+      color: #f1f5f9;
+      min-height: 100vh;
+      padding: 16px 16px 48px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ── TYPOGRAPHY ── */
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: #475569;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 16px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: #0f172a;
+      border-radius: 14px;
+      border: 1px solid #1e293b;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      width: 100%;
+      height: 50px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: opacity 0.15s;
+    }
+    .btn:active { opacity: 0.75; }
+    .btn-primary { background: #1d4ed8; color: #fff; }
+    .btn-success { background: #15803d; color: #fff; }
+    .btn-avg     { background: #7c3aed; color: #fff; }
+    .btn-reset   { background: #1e293b; color: #94a3b8; font-size: 13px; height: 40px; }
+    .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .btn-row .btn { flex: 1; }
+
+    /* ── PLACEMENT DIAGRAM ── */
+    .diagram {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f172a;
+      border-radius: 14px;
+      border: 1px solid #1e293b;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+    .diagram-flag { font-size: 28px; text-align: center; }
+    .diagram-phone {
+      flex: 1;
+      height: 36px;
+      background: #1e293b;
+      border-radius: 6px;
+      border: 2px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #475569;
+      letter-spacing: 0.1em;
+    }
+    .diagram-ball { font-size: 24px; text-align: center; }
+    .diagram-label {
+      font-size: 10px;
+      color: #475569;
+      text-align: center;
+      margin-top: 4px;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── LIVE VALUES ── */
+    .live-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .live-box {
+      background: #020817;
+      border-radius: 10px;
+      border: 1px solid #1e293b;
+      padding: 10px 12px;
+    }
+    .live-box-label { font-size: 10px; color: #475569; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; }
+    .live-box-value { font-size: 26px; font-weight: 800; font-family: 'Courier New', monospace; }
+    .live-box-sub   { font-size: 11px; color: #475569; margin-top: 1px; }
+    .col-side { color: #4ade80; }
+    .col-ud   { color: #fb923c; }
+
+    /* ── LOCKED READING ── */
+    .reading-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .reading-main { display: flex; gap: 12px; }
+    .reading-chip {
+      background: #020817;
+      border-radius: 8px;
+      border: 1px solid #1e293b;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    .reading-chip-label { font-size: 9px; color: #475569; letter-spacing: 0.1em; text-transform: uppercase; }
+    .reading-chip-val   { font-size: 18px; font-weight: 800; }
+
+    /* ── PREVIOUS READING BADGE ── */
+    .prev-badge {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .prev-badge span { color: #94a3b8; font-weight: 700; }
+
+    /* ── RESULT CARD ── */
+    .result-card {
+      background: linear-gradient(135deg, #0f172a 0%, #0c1628 100%);
+      border-radius: 16px;
+      border: 1px solid #1e293b;
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+    .result-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .result-label { font-size: 10px; letter-spacing: 0.15em; color: #475569; text-transform: uppercase; margin-bottom: 3px; }
+    .result-value { font-size: 44px; font-weight: 800; font-family: 'Courier New', monospace; line-height: 1; }
+    .result-sub   { font-size: 12px; color: #64748b; margin-top: 2px; }
+    .pace-bar-wrap { height: 7px; background: #1e293b; border-radius: 99px; overflow: hidden; margin-top: 6px; }
+    .pace-bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s, background 0.4s; }
+    .pace-bar-labels { display: flex; justify-content: space-between; margin-top: 3px; font-size: 9px; color: #334155; }
+
+    /* ── STEPPER ── */
+    .stepper-label { font-size: 10px; letter-spacing: 0.12em; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px; }
+    .stepper-row { display: flex; align-items: center; background: #020817; border-radius: 10px; border: 1px solid #1e293b; overflow: hidden; }
+    .stepper-btn { width: 44px; height: 44px; background: none; border: none; color: #94a3b8; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .stepper-val { flex: 1; text-align: center; font-size: 19px; font-weight: 700; color: #f1f5f9; font-family: 'Courier New', monospace; }
+
+    /* ── TOGGLE ── */
+    .toggle-label { font-size: 10px; letter-spacing: 0.12em; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px; }
+    .toggle-row { display: flex; background: #020817; border-radius: 10px; border: 1px solid #1e293b; overflow: hidden; }
+    .toggle-btn { flex: 1; height: 42px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; background: none; color: #64748b; transition: all 0.2s; }
+    .toggle-btn.active { background: #1d4ed8; color: #fff; border-radius: 8px; }
+
+    /* ── STIMP HEADER ── */
+    .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .stimp-btn { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; color: #94a3b8; padding: 6px 12px; font-size: 12px; cursor: pointer; text-align: center; }
+    .stimp-label { font-size: 9px; color: #475569; }
+    .stimp-val   { font-size: 16px; font-weight: 700; color: #f1f5f9; font-family: monospace; }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: #1e293b; margin: 16px 0; }
+
+    /* ── PERMISSION SCREEN ── */
+    #permission-screen { padding-top: 60px; text-align: center; }
+    #permission-screen p { color: #64748b; font-size: 13px; line-height: 1.7; margin-bottom: 24px; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     PERMISSION SCREEN
+════════════════════════════════════════════════ -->
+<div id="permission-screen">
+  <div class="section-label">Putting Calculator</div>
+  <div class="title" style="font-size:24px; margin-bottom:12px;">⛳ Green Reader</div>
+  <p>This app uses your phone's motion sensors to measure green slope.<br/><br/>
+     Please allow motion access when prompted.</p>
+  <button class="btn btn-primary" onclick="requestPermission()">Enable Motion Sensors</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN APP
+════════════════════════════════════════════════ -->
+<div id="main-app" class="hidden">
+
+  <!-- Header with stimp -->
+  <div class="header-row">
+    <div>
+      <div class="section-label">Green Reader</div>
+      <div style="font-size:20px; font-weight:700;">⛳ Putting Calc</div>
+    </div>
+    <div class="stimp-btn" onclick="toggleStimp()">
+      <div class="stimp-label">STIMP</div>
+      <div class="stimp-val" id="stimp-display">10.0</div>
+    </div>
+  </div>
+
+  <!-- Stimp expander -->
+  <div id="stimp-panel" class="card hidden" style="margin-bottom:12px;">
+    <div class="stepper-label">Green Speed (Stimp)</div>
+    <div class="stepper-row">
+      <button class="stepper-btn" onclick="adjustStimp(-0.5)">−</button>
+      <div class="stepper-val" id="stimp-stepper-val">10.0</div>
+      <button class="stepper-btn" onclick="adjustStimp(0.5)">+</button>
+    </div>
+  </div>
+
+  <!-- ── SLOPE READER ── -->
+  <div class="section-label" style="margin-bottom:6px;">Step 1 · Measure Slope</div>
+
+  <!-- Placement diagram -->
+  <div class="diagram">
+    <div>
+      <div class="diagram-flag">🚩</div>
+      <div class="diagram-label">HOLE</div>
+    </div>
+    <div style="flex:1; padding: 0 8px;">
+      <div class="diagram-phone">SCREEN UP · LANDSCAPE</div>
+    </div>
+    <div>
+      <div class="diagram-ball">⚪</div>
+      <div class="diagram-label">BALL</div>
+    </div>
+  </div>
+  <div style="font-size:11px; color:#475569; margin-bottom:12px; text-align:center;">
+    Place phone perpendicular to ball-hole line · flag left · ball right
+  </div>
+
+  <!-- Live reading area -->
+  <div class="card" id="reader-card">
+    <!-- State: ready to read -->
+    <div id="state-ready">
+      <button class="btn btn-primary" onclick="startReading()">Read Slope</button>
+    </div>
+
+    <!-- State: reading live -->
+    <div id="state-reading" class="hidden">
+      <div style="font-size:11px; color:#64748b; margin-bottom:8px; text-align:center; letter-spacing:0.08em;">LIVE · WATCHING FOR STABLE VALUES</div>
+      <div class="live-grid">
+        <div class="live-box">
+          <div class="live-box-label">Side Slope</div>
+          <div class="live-box-value col-side" id="live-side">—</div>
+          <div class="live-box-sub" id="live-side-dir">—</div>
+        </div>
+        <div class="live-box">
+          <div class="live-box-label">Up / Down</div>
+          <div class="live-box-value col-ud" id="live-ud">—</div>
+          <div class="live-box-sub" id="live-ud-dir">—</div>
+        </div>
+      </div>
+      <button class="btn btn-success" onclick="lockReading()">Lock Reading ✓</button>
+    </div>
+
+    <!-- State: locked -->
+    <div id="state-locked" class="hidden">
+      <div style="font-size:10px; color:#475569; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px;">Locked Reading</div>
+      <div class="reading-display">
+        <div class="reading-main">
+          <div class="reading-chip">
+            <div class="reading-chip-label">Side</div>
+            <div class="reading-chip-val col-side" id="locked-side">—</div>
+          </div>
+          <div class="reading-chip">
+            <div class="reading-chip-label">Up/Down</div>
+            <div class="reading-chip-val col-ud" id="locked-ud">—</div>
+          </div>
+        </div>
+        <!-- Previous badge -->
+        <div class="prev-badge" id="prev-badge" style="display:none;">
+          <div>
+            <div style="font-size:9px; color:#475569;">PREV</div>
+            <div><span id="prev-side-val">—</span> / <span id="prev-ud-val">—</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" style="font-size:13px;" onclick="startReading()">New Reading</button>
+        <button class="btn btn-avg" id="avg-btn" style="display:none; font-size:13px;" onclick="averageReadings()">Average ⌀</button>
+      </div>
+      <button class="btn btn-reset" onclick="resetReader()">Reset</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── PUTTING CALCULATOR ── -->
+  <div class="section-label" style="margin-bottom:6px;">Step 2 · Calculator</div>
+
+  <!-- Result -->
+  <div class="result-card" id="result-card">
+    <div class="result-row">
+      <div>
+        <div class="result-label">Aim</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:28px; color:#1d4ed8;" id="aim-arrow">—</span>
+          <div class="result-value" id="result-aim">—</div>
+        </div>
+        <div class="result-sub" id="result-aim-sub">Set length &amp; take reading</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="result-label">Pace</div>
+        <div class="result-value" id="result-pace" style="color:#94a3b8;">—</div>
+        <div class="result-sub" id="result-pace-sub">—</div>
+      </div>
+    </div>
+    <div class="pace-bar-wrap">
+      <div class="pace-bar-fill" id="pace-bar" style="width:0%; background:#334155;"></div>
+    </div>
+    <div class="pace-bar-labels"><span>Slow</span><span>Normal</span><span>Fast</span></div>
+  </div>
+
+  <!-- Putt length -->
+  <div class="card">
+    <div class="stepper-label">Putt Length (feet)</div>
+    <div class="stepper-row">
+      <button class="stepper-btn" onclick="adjustLength(-1)">−</button>
+      <div class="stepper-val" id="length-val">10</div>
+      <button class="stepper-btn" onclick="adjustLength(1)">+</button>
+    </div>
+  </div>
+
+  <!-- Manual slope override -->
+  <div class="card" id="manual-override" style="display:none;">
+    <div style="font-size:10px; color:#7c3aed; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:10px;">⚠ Manual Override Active</div>
+    <div style="margin-bottom:10px;">
+      <div class="stepper-label">Side Slope %</div>
+      <div class="stepper-row">
+        <button class="stepper-btn" onclick="adjustManualSide(-0.1)">−</button>
+        <div class="stepper-val" id="manual-side-val">1.0%</div>
+        <button class="stepper-btn" onclick="adjustManualSide(0.1)">+</button>
+      </div>
+    </div>
+    <div style="margin-bottom:10px;">
+      <div class="toggle-label">Break Direction</div>
+      <div class="toggle-row">
+        <button class="toggle-btn" id="tog-side-L" onclick="setManualSideDir('L')">← R to L</button>
+        <button class="toggle-btn active" id="tog-side-R" onclick="setManualSideDir('R')">L to R →</button>
+      </div>
+    </div>
+    <div style="margin-bottom:10px;">
+      <div class="toggle-label">Up / Downhill</div>
+      <div class="toggle-row">
+        <button class="toggle-btn" id="tog-ud-up" onclick="setManualUD('uphill')">⬆ Up</button>
+        <button class="toggle-btn active" id="tog-ud-flat" onclick="setManualUD('flat')">— Flat</button>
+        <button class="toggle-btn" id="tog-ud-down" onclick="setManualUD('downhill')">⬇ Down</button>
+      </div>
+    </div>
+    <div id="manual-ud-slope-wrap" style="display:none;">
+      <div class="stepper-label">Up/Down Slope %</div>
+      <div class="stepper-row">
+        <button class="stepper-btn" onclick="adjustManualUD(-0.1)">−</button>
+        <div class="stepper-val" id="manual-ud-val">1.0%</div>
+        <button class="stepper-btn" onclick="adjustManualUD(0.1)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual entry toggle -->
+  <button class="btn btn-reset" style="margin-bottom:12px;" onclick="toggleManual()" id="manual-toggle-btn">
+    ✏ Enter Slope Manually
+  </button>
+
+</div><!-- end main-app -->
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+var state = {
+  stimp: 10.0,
+  lengthFeet: 10,
+  // Sensor derived
+  sensorActive: false,
+  currentSide: 0,      // % side slope (abs)
+  currentSideDir: 'R', // 'L' or 'R' = aim direction
+  currentUD: 0,        // % up/down slope (abs)
+  currentUDDir: 'flat',// 'uphill','downhill','flat'
+  // Locked readings
+  locked: null,   // {side, sideDir, ud, udDir}
+  previous: null, // {side, sideDir, ud, udDir}
+  // Manual override
+  manualMode: false,
+  manualSide: 1.0,
+  manualSideDir: 'R',
+  manualUD: 1.0,
+  manualUDDir: 'flat',
+  // UI
+  stimpOpen: false,
+  isReading: false,
+};
+
+// ═══════════════════════════════════════════════
+// PERMISSION
+// ═══════════════════════════════════════════════
+async function requestPermission() {
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try {
+      const res = await DeviceOrientationEvent.requestPermission();
+      if (res === 'granted') {
+        showApp();
+        startSensor();
+      } else {
+        alert('Motion access denied.\n\nGo to Settings → Safari → Motion & Orientation Access → ON, then reload.');
+      }
+    } catch(e) {
+      alert('Error: ' + e.message);
+    }
+  } else if (typeof DeviceOrientationEvent !== 'undefined') {
+    showApp();
+    startSensor();
+  } else {
+    alert('Motion sensors not supported. Use manual entry.');
+    showApp();
+  }
+}
+
+function showApp() {
+  document.getElementById('permission-screen').classList.add('hidden');
+  document.getElementById('main-app').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════
+// SENSOR
+// ═══════════════════════════════════════════════
+function startSensor() {
+  state.sensorActive = true;
+  window.addEventListener('deviceorientation', onOrientation);
+}
+
+function onOrientation(e) {
+  if (!state.isReading) return;
+  var beta  = e.beta  || 0; // side slope in our landscape setup
+  var gamma = e.gamma || 0; // up/down in our landscape setup
+
+  // Side slope: beta magnitude, direction from sign
+  var sidePct = Math.abs(beta).toFixed(1);
+  // beta positive = left edge up = R to L break = aim Right
+  // beta negative = right edge up = L to R break = aim Left
+  var sideDir = beta >= 0 ? 'R' : 'L';
+
+  // Up/down: gamma magnitude, direction from sign
+  var udPct = Math.abs(gamma).toFixed(1);
+  var udDir = 'flat';
+  if (Math.abs(gamma) > 0.3) {
+    udDir = gamma > 0 ? 'uphill' : 'downhill';
+  }
+
+  state.currentSide    = parseFloat(sidePct);
+  state.currentSideDir = sideDir;
+  state.currentUD      = parseFloat(udPct);
+  state.currentUDDir   = udDir;
+
+  // Update live display
+  document.getElementById('live-side').textContent = sidePct + '%';
+  document.getElementById('live-side-dir').textContent = sideDir === 'R' ? 'Aim Right' : 'Aim Left';
+  document.getElementById('live-ud').textContent = udPct + '%';
+  document.getElementById('live-ud-dir').textContent =
+    udDir === 'flat' ? 'Flat' : udDir === 'uphill' ? '⬆ Uphill' : '⬇ Downhill';
+}
+
+// ═══════════════════════════════════════════════
+// READER FLOW
+// ═══════════════════════════════════════════════
+function startReading() {
+  state.isReading = true;
+  showState('reading');
+}
+
+function lockReading() {
+  state.isReading = false;
+  // Save previous before overwriting
+  if (state.locked) {
+    state.previous = Object.assign({}, state.locked);
+  }
+  state.locked = {
+    side:    state.currentSide,
+    sideDir: state.currentSideDir,
+    ud:      state.currentUD,
+    udDir:   state.currentUDDir,
+  };
+  updateLockedDisplay();
+  showState('locked');
+  recalc();
+}
+
+function averageReadings() {
+  if (!state.locked || !state.previous) return;
+  var avgSide = ((state.locked.side + state.previous.side) / 2);
+  var avgUD   = ((state.locked.ud   + state.previous.ud)   / 2);
+  // Use direction from the most recent locked reading
+  state.locked = {
+    side:    parseFloat(avgSide.toFixed(1)),
+    sideDir: state.locked.sideDir,
+    ud:      parseFloat(avgUD.toFixed(1)),
+    udDir:   state.locked.udDir,
+  };
+  state.previous = null;
+  updateLockedDisplay();
+  recalc();
+}
+
+function resetReader() {
+  state.locked   = null;
+  state.previous = null;
+  state.isReading = false;
+  showState('ready');
+  clearResult();
+}
+
+function showState(s) {
+  document.getElementById('state-ready').classList.add('hidden');
+  document.getElementById('state-reading').classList.add('hidden');
+  document.getElementById('state-locked').classList.add('hidden');
+  document.getElementById('state-' + s).classList.remove('hidden');
+}
+
+function updateLockedDisplay() {
+  var l = state.locked;
+  document.getElementById('locked-side').textContent =
+    l.side + '% ' + (l.sideDir === 'R' ? '→R' : '←L');
+  document.getElementById('locked-ud').textContent =
+    l.ud + '% ' + (l.udDir === 'flat' ? '—' : l.udDir === 'uphill' ? '⬆' : '⬇');
+
+  var prevBadge = document.getElementById('prev-badge');
+  var avgBtn    = document.getElementById('avg-btn');
+  if (state.previous) {
+    var p = state.previous;
+    document.getElementById('prev-side-val').textContent = p.side + '%';
+    document.getElementById('prev-ud-val').textContent   = p.ud + '%' + (p.udDir === 'flat' ? '' : p.udDir === 'uphill' ? '⬆' : '⬇');
+    prevBadge.style.display = 'flex';
+    avgBtn.style.display    = 'block';
+  } else {
+    prevBadge.style.display = 'none';
+    avgBtn.style.display    = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// MANUAL OVERRIDE
+// ═══════════════════════════════════════════════
+function toggleManual() {
+  state.manualMode = !state.manualMode;
+  document.getElementById('manual-override').style.display = state.manualMode ? 'block' : 'none';
+  document.getElementById('manual-toggle-btn').textContent =
+    state.manualMode ? '✕ Hide Manual Entry' : '✏ Enter Slope Manually';
+  if (state.manualMode) recalc();
+}
+
+function adjustManualSide(d) {
+  state.manualSide = Math.max(0, Math.min(6, parseFloat((state.manualSide + d).toFixed(1))));
+  document.getElementById('manual-side-val').textContent = state.manualSide.toFixed(1) + '%';
+  recalc();
+}
+
+function setManualSideDir(d) {
+  state.manualSideDir = d;
+  document.getElementById('tog-side-L').classList.toggle('active', d === 'L');
+  document.getElementById('tog-side-R').classList.toggle('active', d === 'R');
+  recalc();
+}
+
+function setManualUD(d) {
+  state.manualUDDir = d;
+  ['up','flat','down'].forEach(function(k) {
+    var map = {up:'uphill', flat:'flat', down:'downhill'};
+    document.getElementById('tog-ud-' + k).classList.toggle('active', map[k] === d);
+  });
+  document.getElementById('manual-ud-slope-wrap').style.display = d === 'flat' ? 'none' : 'block';
+  recalc();
+}
+
+function adjustManualUD(d) {
+  state.manualUD = Math.max(0.1, Math.min(6, parseFloat((state.manualUD + d).toFixed(1))));
+  document.getElementById('manual-ud-val').textContent = state.manualUD.toFixed(1) + '%';
+  recalc();
+}
+
+// ═══════════════════════════════════════════════
+// STIMP
+// ═══════════════════════════════════════════════
+function toggleStimp() {
+  state.stimpOpen = !state.stimpOpen;
+  document.getElementById('stimp-panel').classList.toggle('hidden', !state.stimpOpen);
+}
+
+function adjustStimp(d) {
+  state.stimp = Math.max(7, Math.min(14, parseFloat((state.stimp + d).toFixed(1))));
+  document.getElementById('stimp-display').textContent = state.stimp.toFixed(1);
+  document.getElementById('stimp-stepper-val').textContent = state.stimp.toFixed(1);
+  recalc();
+}
+
+// ═══════════════════════════════════════════════
+// PUTT LENGTH
+// ═══════════════════════════════════════════════
+function adjustLength(d) {
+  state.lengthFeet = Math.max(1, Math.min(100, state.lengthFeet + d));
+  document.getElementById('length-val').textContent = state.lengthFeet;
+  recalc();
+}
+
+// ═══════════════════════════════════════════════
+// CALCULATION ENGINE
+// ═══════════════════════════════════════════════
+function calcPutt(lengthFeet, sidePct, sideDir, udDir, udPct, stimp) {
+  var paces = lengthFeet / 3;
+  var base  = (paces * 2) - 1;
+
+  // Aim at 1% side slope
+  var aim = base * sidePct;
+
+  // Up/downhill adjustment = base × 0.05 × udPct
+  var adj = base * 0.05 * udPct;
+  if (udDir === 'uphill')   aim = aim - adj;
+  if (udDir === 'downhill') aim = aim + adj;
+
+  // Stimp adjustment
+  var stimpDelta = stimp - 10;
+  aim = aim * (1 + 0.10 * stimpDelta);
+
+  // Pace
+  var pace = 100;
+  if (udDir === 'uphill')   pace = pace + (5 * udPct);
+  if (udDir === 'downhill') pace = pace - (5 * udPct);
+  pace = pace - (stimpDelta * 5);
+  pace = Math.max(30, Math.min(200, pace));
+
+  // Format aim
+  var aimStr = '';
+  if (aim < 12) {
+    aimStr = aim.toFixed(1) + '"';
+  } else {
+    var ft = Math.floor(aim / 12);
+    var ins = Math.round(aim % 12);
+    aimStr = ins === 0 ? ft + "'" : ft + "' " + ins + '"';
+  }
+
+  return { aim: aim, aimStr: aimStr, aimDir: sideDir, pace: Math.round(pace) };
+}
+
+function recalc() {
+  var side, sideDir, ud, udDir;
+
+  if (state.manualMode) {
+    side    = state.manualSide;
+    sideDir = state.manualSideDir;
+    ud      = state.manualUD;
+    udDir   = state.manualUDDir;
+  } else if (state.locked) {
+    side    = state.locked.side;
+    sideDir = state.locked.sideDir;
+    ud      = state.locked.ud;
+    udDir   = state.locked.udDir;
+  } else {
+    clearResult();
+    return;
+  }
+
+  var r = calcPutt(state.lengthFeet, side, sideDir, udDir, ud, state.stimp);
+
+  // Aim
+  document.getElementById('aim-arrow').textContent = sideDir === 'L' ? '←' : '→';
+  document.getElementById('result-aim').textContent = r.aimStr;
+  document.getElementById('result-aim-sub').textContent =
+    (sideDir === 'L' ? 'Left' : 'Right') + ' of pin';
+
+  // Pace
+  var col = r.pace >= 90 && r.pace <= 115 ? '#4ade80' : r.pace < 60 || r.pace > 150 ? '#f87171' : '#fb923c';
+  document.getElementById('result-pace').textContent = r.pace + '%';
+  document.getElementById('result-pace').style.color = col;
+  document.getElementById('result-pace-sub').textContent =
+    r.pace < 80 ? 'Die at hole' : r.pace > 120 ? 'Firm pace' : 'Ideal pace';
+
+  // Pace bar
+  var pct = Math.min(100, (r.pace / 160) * 100);
+  document.getElementById('pace-bar').style.width = pct + '%';
+  document.getElementById('pace-bar').style.background = col;
+}
+
+function clearResult() {
+  document.getElementById('aim-arrow').textContent = '—';
+  document.getElementById('result-aim').textContent = '—';
+  document.getElementById('result-aim-sub').textContent = 'Take a reading first';
+  document.getElementById('result-pace').textContent = '—';
+  document.getElementById('result-pace').style.color = '#94a3b8';
+  document.getElementById('result-pace-sub').textContent = '—';
+  document.getElementById('pace-bar').style.width = '0%';
+}
+
+// Init
+recalc();
+</script>
+</body>
+</html>

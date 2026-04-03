@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Gyro Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #020817;
+      font-family: 'Courier New', monospace;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: #475569;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 400px;
+      background: #0f172a;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      padding: 16px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+    button {
+      width: 100%;
+      height: 52px;
+      background: #1d4ed8;
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid #1e293b;
+    }
+    .row:last-child { border-bottom: none; }
+    .row-label { font-size: 14px; font-weight: 700; }
+    .row-desc { font-size: 11px; color: #475569; }
+    .row-value { font-size: 28px; font-weight: 800; min-width: 100px; text-align: right; }
+    .alpha { color: #94a3b8; }
+    .beta  { color: #fb923c; }
+    .gamma { color: #4ade80; }
+    .instructions { font-size: 12px; color: #64748b; line-height: 1.7; }
+    .instructions span.b { color: #fb923c; }
+    .instructions span.g { color: #4ade80; }
+    #status-msg { font-size: 14px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div style="width:100%;max-width:400px;">
+    <div class="label">Section 2 · Sensor Test</div>
+    <h1>Gyroscope Test</h1>
+
+    <div class="card">
+      <div id="status-msg">Tap the button to test your device's motion sensors.</div>
+    </div>
+
+    <button id="btn" onclick="requestPermission()">Request Sensor Permission</button>
+
+    <div class="card" id="angles-card" style="display:none; padding:0;">
+      <div class="row">
+        <div>
+          <div class="row-label alpha">Alpha (α)</div>
+          <div class="row-desc">Compass / rotation</div>
+        </div>
+        <div class="row-value alpha" id="val-alpha">—</div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label beta">Beta (β)</div>
+          <div class="row-desc">Front-back tilt</div>
+        </div>
+        <div class="row-value beta" id="val-beta">—</div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="row-label gamma">Gamma (γ)</div>
+          <div class="row-desc">Left-right tilt</div>
+        </div>
+        <div class="row-value gamma" id="val-gamma">—</div>
+      </div>
+    </div>
+
+    <div class="card instructions" id="instructions" style="display:none;">
+      <strong style="color:#94a3b8;">Quick test:</strong><br/>
+      1. Hold phone flat → all values near 0°<br/>
+      2. Tilt left/right → watch <span class="g">Gamma (γ)</span> change<br/>
+      3. Tilt front/back → watch <span class="b">Beta (β)</span> change<br/>
+      4. Rotate to landscape → note which values shift<br/><br/>
+      <strong style="color:#94a3b8;">Report back:</strong><br/>
+      • Did values change as expected?<br/>
+      • In landscape, which axis responds to left-right tilt?
+    </div>
+  </div>
+
+  <script>
+    function setStatus(msg) {
+      document.getElementById('status-msg').innerHTML = msg;
+    }
+
+    function startListening() {
+      document.getElementById('btn').style.display = 'none';
+      document.getElementById('angles-card').style.display = 'block';
+      document.getElementById('instructions').style.display = 'block';
+
+      window.addEventListener('deviceorientation', function(e) {
+        document.getElementById('val-alpha').textContent =
+          e.alpha != null ? e.alpha.toFixed(1) + '°' : 'n/a';
+        document.getElementById('val-beta').textContent =
+          e.beta != null ? e.beta.toFixed(1) + '°' : 'n/a';
+        document.getElementById('val-gamma').textContent =
+          e.gamma != null ? e.gamma.toFixed(1) + '°' : 'n/a';
+      });
+    }
+
+    async function requestPermission() {
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+          typeof DeviceOrientationEvent.requestPermission === 'function') {
+        try {
+          const response = await DeviceOrientationEvent.requestPermission();
+          if (response === 'granted') {
+            setStatus('✅ Permission granted! Tilt your phone and watch the values.');
+            startListening();
+          } else {
+            setStatus('❌ Permission denied. Please allow motion access in Safari Settings → Privacy → Motion & Fitness.');
+          }
+        } catch(err) {
+          setStatus('❌ Error: ' + err.message);
+        }
+      } else if (typeof DeviceOrientationEvent !== 'undefined') {
+        setStatus('✅ No permission needed — sensors active!');
+        startListening();
+      } else {
+        setStatus('❌ DeviceOrientation not supported on this browser.');
+      }
+    }
+  </script>
+</body>
+</html>
